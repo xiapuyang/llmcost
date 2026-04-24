@@ -21,7 +21,7 @@ def _default_answers(overrides: dict | None = None) -> dict:
         "source region":  "Any (default)",
         "caching":        "Yes",
         "Arena score":    "1300 (default)",
-        "price":          "$10/M (default)",
+        "ceiling":        "claude-opus-4-7 (default)",
     }
     if overrides:
         answers.update(overrides)
@@ -109,7 +109,7 @@ def test_default_values_all_defaults():
     assert prefs.cache_hit_ratio == 0.20   # chat registry preset
     assert prefs.min_arena_score == 1300
     assert prefs.providers == all_providers
-    assert prefs.max_price == 10.0
+    assert prefs.max_price_model == "claude-opus-4-7"
 
 
 def test_sample_blends_with_preset_ratio():
@@ -315,8 +315,8 @@ def test_multiple_samples_blended_with_preset():
     assert abs(prefs.input_ratio - 0.7725) < 0.001
 
 
-def test_max_price_selected():
-    """Selecting a non-default max price is stored as a float."""
+def test_max_price_sota_model_selected():
+    """Selecting a SOTA model stores its direct_id in max_price_model."""
     from llmcost.pricing.config import PROVIDERS
     all_providers = list(PROVIDERS.keys())
 
@@ -324,16 +324,16 @@ def test_max_price_selected():
         select_map={
             "use case": "chat", "images": "No",
             "context length": "No requirement", "source region": "Any (default)", "Arena score": "1300 (default)",
-            "price": "$75/M",
+            "ceiling": "gpt-5.4",
         },
         checkbox_return=all_providers,
         text_sequence=[""],
     )
-    assert prefs.max_price == 75.0
+    assert prefs.max_price_model == "gpt-5.4"
 
 
 def test_max_price_no_limit_is_none():
-    """Selecting 'No limit' stores max_price=None."""
+    """Selecting 'No limit' stores max_price_model=None."""
     from llmcost.pricing.config import PROVIDERS
     all_providers = list(PROVIDERS.keys())
 
@@ -341,9 +341,9 @@ def test_max_price_no_limit_is_none():
         select_map={
             "use case": "chat", "images": "No",
             "context length": "No requirement", "source region": "Any (default)", "Arena score": "1300 (default)",
-            "price": "No limit",
+            "ceiling": "No limit",
         },
         checkbox_return=all_providers,
         text_sequence=[""],
     )
-    assert prefs.max_price is None
+    assert prefs.max_price_model is None

@@ -81,6 +81,25 @@ class ModelRecommender:
 
     # ── Private helpers ────────────────────────────────────────────────────
 
+    def _resolve_max_price(self, prefs: UserPreferences) -> float | None:
+        """Resolve max_price_model to a weighted price ceiling.
+
+        Looks up the SOTA model by direct_id or slug; falls back to prefs.max_price.
+        """
+        model_id = prefs.max_price_model
+        if not model_id:
+            return prefs.max_price
+        for r in self._records:
+            slug = r.direct_id or r.id.split("/")[-1]
+            if slug == model_id:
+                from llmcost.pricing.display.table import compute_weighted
+                return compute_weighted(
+                    r,
+                    input_ratio=prefs.input_ratio,
+                    cache_hit_ratio=prefs.cache_hit_ratio,
+                )
+        return prefs.max_price
+
     def _filter(self, prefs: UserPreferences) -> list[ModelRecord]:
         """Apply all filters and return the surviving records.
 
@@ -94,6 +113,7 @@ class ModelRecommender:
         return (
             RecordFilter(self._records)
             .apply_blacklist(blacklist_filter=self._blacklist_filter)
+            .exclude_redundant_pinned()
             .exclude_z_ai()
             .min_arena_score(prefs.min_arena_score)
             .category(target_category)
@@ -105,7 +125,7 @@ class ModelRecommender:
             .require_arena_score()
             .has_cache_pricing(enabled=prefs.require_cache_pricing)
             .max_weighted_price(
-                prefs.max_price,
+                self._resolve_max_price(prefs),
                 input_ratio=prefs.input_ratio,
                 cache_hit_ratio=prefs.cache_hit_ratio,
             )

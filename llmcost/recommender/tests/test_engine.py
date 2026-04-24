@@ -58,6 +58,7 @@ def _prefs(**kwargs) -> UserPreferences:
         min_arena_score=0,
         providers=None,
         max_price=None,
+        max_price_model=None,
         require_cache_pricing=False,
     )
     defaults.update(kwargs)
