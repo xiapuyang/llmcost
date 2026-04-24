@@ -123,6 +123,17 @@ class RecordFilter:
 
     # ── Threshold / selection filters ─────────────────────────────────────────
 
+    def has_cache_pricing(self, enabled: bool = True) -> RecordFilter:
+        """Keep only models that have cache_read_per_mtok set."""
+        if enabled:
+            self._records = [r for r in self._records if r.cache_read_per_mtok is not None]
+        return self
+
+    def require_arena_score(self) -> RecordFilter:
+        """Drop records with no Arena score."""
+        self._records = [r for r in self._records if r.arena_score is not None]
+        return self
+
     def min_arena_score(self, threshold: int) -> RecordFilter:
         """Exclude models below *threshold* Arena score. No-op when threshold <= 0."""
         if threshold > 0:

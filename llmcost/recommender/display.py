@@ -73,6 +73,8 @@ def _build_panel(rec: Recommendation) -> Panel:
     lines.append(f"{rec.record.id}\n", style="bold")
     lines.append(f"Provider:  {rec.record.provider}\n")
     lines.append(f"Price:     ${rec.weighted_price:.2f}/M tokens\n")
+    if rec.value_ratio is not None:
+        lines.append(f"$/kArena:  {rec.value_ratio:.3f}\n")
     if rec.record.arena_score is not None:
         lines.append(f"Arena:     {rec.record.arena_score}\n")
     lines.append(f"\n{rec.rationale}", style="dim")

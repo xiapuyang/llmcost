@@ -22,6 +22,7 @@ class Recommendation:
     tier: str
     record: ModelRecord
     weighted_price: float
+    value_ratio: float | None
     rationale: str
 
 
@@ -65,12 +66,13 @@ class ModelRecommender:
         scored = self._score(surviving, prefs)
 
         if surviving_count < 3:
-            winner = min(scored, key=lambda t: t[1])  # lowest weighted price
+            winner = min(scored, key=lambda t: t[2] if t[2] is not None else float("inf"))
             rec = self._make_recommendation(
                 "Best Value",
                 winner[0],
                 winner[1],
-                f"Lowest weighted cost: ${winner[1]:.2f}/M tokens "
+                winner[2],
+                f"Lowest $/kArena: {winner[2]:.3f} "
                 f"(only {surviving_count} model(s) matched your criteria)",
             )
             return [rec], surviving_count
@@ -100,6 +102,8 @@ class ModelRecommender:
             .model_source(prefs.model_source)
             .providers_subset(prefs.providers)
             .require_pricing()
+            .require_arena_score()
+            .has_cache_pricing(enabled=prefs.require_cache_pricing)
             .max_weighted_price(
                 prefs.max_price,
                 input_ratio=prefs.input_ratio,
@@ -110,15 +114,15 @@ class ModelRecommender:
 
     def _score(
         self, records: list[ModelRecord], prefs: UserPreferences
-    ) -> list[tuple[ModelRecord, float]]:
-        """Compute weighted price for each record.
+    ) -> list[tuple[ModelRecord, float, float | None]]:
+        """Compute weighted price and value ratio for each record.
 
         Args:
             records: Filtered ModelRecord list.
             prefs: User preferences for scoring.
 
         Returns:
-            List of (record, weighted_price) tuples.
+            List of (record, weighted_price, value_ratio) tuples.
         """
         result = []
         for r in records:
@@ -127,67 +131,74 @@ class ModelRecommender:
                 input_ratio=prefs.input_ratio,
                 cache_hit_ratio=prefs.cache_hit_ratio,
             )
-            if w is not None:
-                result.append((r, w))
+            if w is None:
+                continue
+            vr = compute_value_ratio(
+                r,
+                input_ratio=prefs.input_ratio,
+                cache_hit_ratio=prefs.cache_hit_ratio,
+            )
+            result.append((r, w, vr))
         return result
 
     def _select_tiers(
         self,
-        scored: list[tuple[ModelRecord, float]],
+        scored: list[tuple[ModelRecord, float, float | None]],
         prefs: UserPreferences,
     ) -> list[Recommendation]:
         """Select Best Value, Best Quality, and Balanced tier winners.
 
         Args:
-            scored: List of (record, weighted_price) tuples.
+            scored: List of (record, weighted_price, value_ratio) tuples.
             prefs: User preferences.
 
         Returns:
             List of up to 3 Recommendation objects (deduplicated by record id).
         """
-        # Best Value: lowest weighted price
-        best_value_item = min(scored, key=lambda t: t[1])
+        # Best Value: lowest $/kArena (value_ratio)
+        with_vr = [(r, w, vr) for r, w, vr in scored if vr is not None]
+        best_value_item = min(with_vr or scored, key=lambda t: t[2] if t[2] is not None else float("inf"))
         best_value = self._make_recommendation(
             "Best Value",
             best_value_item[0],
             best_value_item[1],
-            f"Lowest weighted cost: ${best_value_item[1]:.2f}/M tokens",
+            best_value_item[2],
+            f"Lowest $/kArena: {best_value_item[2]:.3f}",
         )
 
-        # Best Quality: highest Arena score (skip records with arena_score=None)
-        with_arena = [(r, w) for r, w in scored if r.arena_score is not None]
+        # Best Quality: highest Arena score
+        with_arena = [(r, w, vr) for r, w, vr in scored if r.arena_score is not None]
         if with_arena:
             best_quality_item = max(with_arena, key=lambda t: t[0].arena_score)
             best_quality = self._make_recommendation(
                 "Best Quality",
                 best_quality_item[0],
                 best_quality_item[1],
+                best_quality_item[2],
                 f"Highest Arena score: {best_quality_item[0].arena_score}",
             )
         else:
             best_quality = None
 
-        # Balanced: rank aggregation
+        # Balanced: rank aggregation on $/kArena and arena_score
         n = len(scored)
-        price_sorted = sorted(range(n), key=lambda i: scored[i][1])  # lower = better
-        price_rank = [0] * n
-        for rank, idx in enumerate(price_sorted):
-            price_rank[idx] = rank
+        vr_sorted = sorted(range(n), key=lambda i: scored[i][2] if scored[i][2] is not None else float("inf"))
+        vr_rank = [0] * n
+        for rank, idx in enumerate(vr_sorted):
+            vr_rank[idx] = rank
 
-        # Quality rank: higher arena_score = better (lower rank number)
-        # Records with arena_score=None get rank n (worst)
         def quality_sort_key(i: int) -> int:
             score = scored[i][0].arena_score
-            return -(score if score is not None else 0)  # negate for ascending sort
+            return -(score if score is not None else 0)
 
         quality_sorted = sorted(range(n), key=quality_sort_key)
         quality_rank = [0] * n
         for rank, idx in enumerate(quality_sorted):
             quality_rank[idx] = rank
 
-        # Combined: 40% price + 60% quality, normalized to [0, 1]
+        # Combined: 40% $/kArena rank + 60% quality rank, normalized to [0, 1]
         combined = [
-            (0.4 * price_rank[i] / (n - 1) + 0.6 * quality_rank[i] / (n - 1), i)
+            (0.4 * vr_rank[i] / (n - 1) + 0.6 * quality_rank[i] / (n - 1), i)
             for i in range(n)
         ]
         balanced_idx = min(combined, key=lambda t: t[0])[1]
@@ -196,7 +207,8 @@ class ModelRecommender:
             "Balanced",
             balanced_item[0],
             balanced_item[1],
-            "Best combined cost-quality rank",
+            balanced_item[2],
+            "Best combined $/kArena + quality rank",
         )
 
         # Deduplicate by record id
@@ -215,6 +227,7 @@ class ModelRecommender:
         tier: str,
         record: ModelRecord,
         weighted_price: float,
+        value_ratio: float | None,
         rationale: str,
     ) -> Recommendation:
         """Build a Recommendation dataclass.
@@ -222,7 +235,8 @@ class ModelRecommender:
         Args:
             tier: Tier name string.
             record: The winning ModelRecord.
-            weighted_price: Computed weighted price.
+            weighted_price: Computed weighted price ($/M tokens).
+            value_ratio: Cost per kArena ($/kArena).
             rationale: Human-readable explanation.
 
         Returns:
@@ -232,5 +246,6 @@ class ModelRecommender:
             tier=tier,
             record=record,
             weighted_price=weighted_price,
+            value_ratio=value_ratio,
             rationale=rationale,
         )

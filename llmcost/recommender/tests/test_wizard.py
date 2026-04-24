@@ -12,19 +12,16 @@ from llmcost.recommender.wizard import RecommendWizard, UserPreferences
 # ── Helpers ────────────────────────────────────────────────────────────────
 
 def _default_answers(overrides: dict | None = None) -> dict:
-    """Return a mapping of questionary prompt substrings → answer values.
-
-    Defaults: Q1=chat, Q1.5=No, Q1.6=skip, Q3=No requirement, Q4=Any, Q6=1300.
-    Q2 and Q5 are removed (no longer exist in the wizard).
-    """
+    """Return a mapping of questionary prompt substrings → answer values."""
     answers = {
-        "Q1.":  "chat",
-        "Q1.5.": "No",
-        "Q1.6.": "",               # empty → skip
-        "Q3.":  "No requirement",
-        "Q4.":  "Any (default)",
-        "Q6.":  "1300 (default)",
-        "Q7.":  None,              # checkbox — handled separately
+        "use case":       "chat",
+        "images":         "No",
+        "input sample":   "",          # empty → skip
+        "context length": "No requirement",
+        "source region":  "Any (default)",
+        "caching":        "Yes",
+        "Arena score":    "1300 (default)",
+        "price":          "$10/M (default)",
     }
     if overrides:
         answers.update(overrides)
@@ -93,14 +90,14 @@ def test_default_values_all_defaults():
 
     prefs = _run_wizard_with_mocks(
         select_map={
-            "Q1.":  "chat",
-            "Q1.5.": "No",
-            "Q3.":  "No requirement",
-            "Q4.":  "Any (default)",
-            "Q6.":  "1300 (default)",
+            "use case":       "chat",
+            "images":         "No",
+            "context length": "No requirement",
+            "source region":  "Any (default)",
+            "Arena score":    "1300 (default)",
         },
         checkbox_return=all_providers,
-        text_sequence=[""],  # Q1.6 skipped
+        text_sequence=[""],
     )
 
     assert prefs.use_case == "chat"
@@ -127,8 +124,8 @@ def test_sample_blends_with_preset_ratio():
 
     prefs = _run_wizard_with_mocks(
         select_map={
-            "Q1.": "chat", "Q1.5.": "No",
-            "Q3.": "No requirement", "Q4.": "Any (default)", "Q6.": "1300 (default)",
+            "use case": "chat", "images": "No",
+            "context length": "No requirement", "source region": "Any (default)", "Arena score": "1300 (default)",
         },
         checkbox_return=all_providers,
         text_sequence=[input_sample, output_sample],
@@ -145,11 +142,11 @@ def test_use_case_presets_applied_from_registry():
 
     prefs = _run_wizard_with_mocks(
         select_map={
-            "Q1.": "summarization", "Q1.5.": "No",
-            "Q4.": "Any (default)", "Q6.": "1300 (default)",
+            "use case": "summarization", "images": "No",
+            "source region": "Any (default)", "Arena score": "1300 (default)",
         },
         checkbox_return=all_providers,
-        text_sequence=[""],  # skip sample
+        text_sequence=[""],
     )
 
     assert prefs.use_case == "summarization"
@@ -167,7 +164,7 @@ def test_image_use_case_skips_q16():
 
     def mock_select(prompt, **kwargs):
         m = MagicMock()
-        if "Q1." in prompt and "Q1.5." not in prompt:
+        if "use case" in prompt:
             m.ask.return_value = "text-to-image"
         else:
             m.ask.return_value = kwargs.get("default", "")
@@ -201,9 +198,9 @@ def test_vision_input_true_skips_q16():
 
     def mock_select(prompt, **kwargs):
         m = MagicMock()
-        if "Q1." in prompt and "Q1.5." not in prompt:
+        if "use case" in prompt:
             m.ask.return_value = "chat"
-        elif "Q1.5." in prompt:
+        elif "images" in prompt:
             m.ask.return_value = "Yes"
         else:
             m.ask.return_value = kwargs.get("default", "")
@@ -256,8 +253,8 @@ def test_empty_checkbox_returns_none_providers():
     """Deselecting all providers results in providers=None."""
     prefs = _run_wizard_with_mocks(
         select_map={
-            "Q1.": "chat", "Q1.5.": "No",
-            "Q3.": "No requirement", "Q4.": "Any (default)", "Q6.": "1300 (default)",
+            "use case": "chat", "images": "No",
+            "context length": "No requirement", "source region": "Any (default)", "Arena score": "1300 (default)",
         },
         checkbox_return=[],
         text_sequence=[""],
@@ -279,9 +276,9 @@ def test_multiple_samples_blended_with_preset():
 
     def mock_select(prompt, **kwargs):
         m = MagicMock()
-        if "Q1." in prompt and "Q1.5." not in prompt:
+        if "use case" in prompt:
             m.ask.return_value = "chat"
-        elif "Q1.5." in prompt:
+        elif "images" in prompt:
             m.ask.return_value = "No"
         else:
             m.ask.return_value = kwargs.get("default", "")
@@ -325,9 +322,9 @@ def test_max_price_selected():
 
     prefs = _run_wizard_with_mocks(
         select_map={
-            "Q1.": "chat", "Q1.5.": "No",
-            "Q3.": "No requirement", "Q4.": "Any (default)", "Q6.": "1300 (default)",
-            "Q8.": "$75/M",
+            "use case": "chat", "images": "No",
+            "context length": "No requirement", "source region": "Any (default)", "Arena score": "1300 (default)",
+            "price": "$75/M",
         },
         checkbox_return=all_providers,
         text_sequence=[""],
@@ -342,9 +339,9 @@ def test_max_price_no_limit_is_none():
 
     prefs = _run_wizard_with_mocks(
         select_map={
-            "Q1.": "chat", "Q1.5.": "No",
-            "Q3.": "No requirement", "Q4.": "Any (default)", "Q6.": "1300 (default)",
-            "Q8.": "No limit",
+            "use case": "chat", "images": "No",
+            "context length": "No requirement", "source region": "Any (default)", "Arena score": "1300 (default)",
+            "price": "No limit",
         },
         checkbox_return=all_providers,
         text_sequence=[""],

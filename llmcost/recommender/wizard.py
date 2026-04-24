@@ -110,7 +110,7 @@ _PRICE_OPTIONS: list[tuple[str, float]] = [
 class UserPreferences:
     """Collected user preferences for model recommendation."""
 
-    use_case: str = "chat"
+    use_case: str = "Hermes"
     vision_input: bool = False
     input_ratio: float = 0.7
     input_ratio_source: str = "preset"  # "preset" | "blended" | "sample"
@@ -120,6 +120,7 @@ class UserPreferences:
     min_arena_score: int = 1300
     providers: list[str] | None = None  # None means all providers
     max_price: float | None = None  # None means no limit ($/M tokens)
+    require_cache_pricing: bool = True
 
 
 class RecommendWizard:
@@ -143,9 +144,9 @@ class RecommendWizard:
         # Q1: Use case
         use_case = self._ask(
             questionary.select(
-                "Q1. Select your use case:",
+                "Q. Select your use case:",
                 choices=_use_case_choices(),
-                default="chat",
+                default="Hermes",
             )
         )
         prefs.use_case = use_case
@@ -158,7 +159,7 @@ class RecommendWizard:
         vision_default = _uc.vision_default if _uc else False
         vision_answer = self._ask(
             questionary.select(
-                "Q1.5. Does your input include images?",
+                "Q. Does your input include images?",
                 choices=["No", "Yes"],
                 default="Yes" if vision_default else "No",
             )
@@ -185,7 +186,7 @@ class RecommendWizard:
         )
         context_label = self._ask(
             questionary.select(
-                "Q3. Minimum context length requirement:",
+                "Q. Minimum context length requirement:",
                 choices=[label for label, _ in _CONTEXT_OPTIONS],
                 default=ctx_default_label,
             )
@@ -195,17 +196,27 @@ class RecommendWizard:
         # Q4: Model source
         source_label = self._ask(
             questionary.select(
-                "Q4. Model source region:",
+                "Q. Model source region:",
                 choices=["Any (default)", "US / International", "China only"],
                 default="Any (default)",
             )
         )
         prefs.model_source = {"Any (default)": "any", "US / International": "us", "China only": "cn"}[source_label]
 
+        # Q5: Cache pricing requirement
+        cache_answer = self._ask(
+            questionary.select(
+                "Q. Require prompt caching support?",
+                choices=["No", "Yes"],
+                default="Yes",
+            )
+        )
+        prefs.require_cache_pricing = cache_answer == "Yes"
+
         # Q6: Min Arena score
         arena_label = self._ask(
             questionary.select(
-                "Q6. Minimum Arena score threshold:",
+                "Q. Minimum Arena score threshold:",
                 choices=[label for label, _ in _ARENA_OPTIONS],
                 default="1300 (default)",
             )
@@ -222,7 +233,7 @@ class RecommendWizard:
             default_checked = set(all_providers)
         selected = self._ask(
             questionary.checkbox(
-                "Q7. Select providers to include (Space to toggle, Enter to confirm):",
+                "Q. Select providers to include (Space to toggle, Enter to confirm):",
                 choices=[Choice(p, checked=(p in default_checked)) for p in all_providers],
             )
         )
@@ -231,7 +242,7 @@ class RecommendWizard:
         # Q8: Max price
         price_label = self._ask(
             questionary.select(
-                "Q8. Maximum weighted price ($/M tokens):",
+                "Q. Maximum weighted price ($/M tokens):",
                 choices=[label for label, _ in _PRICE_OPTIONS],
                 default="$10/M (default)",
             )
@@ -252,7 +263,7 @@ class RecommendWizard:
 
         first_input = self._ask(
             questionary.text(
-                "Q1.6. Paste a typical input sample for better accuracy (Enter to skip and use preset):"
+                "Q. Paste a typical input sample for better accuracy (Enter to skip and use preset):"
             )
         )
         if not first_input:

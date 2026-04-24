@@ -43,6 +43,7 @@ def _make_rec(tier: str, record_id: str, weighted_price: float = 1.0) -> Recomme
         tier=tier,
         record=_make_record(record_id),
         weighted_price=weighted_price,
+        value_ratio=None,
         rationale=f"Test rationale for {tier}",
     )
 
@@ -154,6 +155,7 @@ def test_panel_omits_arena_when_none():
         tier="Best Value",
         record=_make_record("p/no-arena", arena_score=None),
         weighted_price=1.0,
+        value_ratio=None,
         rationale="No arena score",
     )
     out = _capture(display_recommendations, recommendations=[rec], surviving_count=1)

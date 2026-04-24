@@ -58,6 +58,7 @@ def _prefs(**kwargs) -> UserPreferences:
         min_arena_score=0,
         providers=None,
         max_price=None,
+        require_cache_pricing=False,
     )
     defaults.update(kwargs)
     return UserPreferences(**defaults)
@@ -166,24 +167,18 @@ def test_arena_none_excluded_from_best_quality():
     assert best_quality.record.arena_score is not None
 
 
-def test_arena_none_eligible_for_best_value():
-    """Records with arena_score=None are not excluded from Best Value."""
+def test_arena_none_excluded_by_require_arena_score():
+    """Records with arena_score=None are excluded by require_arena_score filter in engine."""
     records = [
         _record("p/no-arena", input_per_mtok=0.01, output_per_mtok=0.04, arena_score=None),
         _record("p/normal1",  input_per_mtok=1.0,  output_per_mtok=4.0,  arena_score=1300),
         _record("p/normal2",  input_per_mtok=2.0,  output_per_mtok=8.0,  arena_score=1350),
         _record("p/normal3",  input_per_mtok=3.0,  output_per_mtok=12.0, arena_score=1200),
     ]
-    recs, _ = ModelRecommender(records).recommend(_prefs())
-    # p/no-arena has no arena_score → value_ratio = None → cannot win Best Value via value_ratio
-    # Actually compute_value_ratio returns None when arena_score is None.
-    # The engine's _score computes weighted price (not value_ratio).
-    # Best Value uses min(scored, key=weighted_price) per... wait, let me re-check
-    # The engine sorts by weighted price for Best Value, not value_ratio per the earlier refactor.
-    # Wait, looking at the engine code: best_value = min(scored, key=lambda t: t[1]) where t[1] = weighted_price
-    # So p/no-arena would win because it has the lowest weighted price.
-    best_value = next(r for r in recs if r.tier == "Best Value")
-    assert best_value.record.id == "p/no-arena"
+    recs, count = ModelRecommender(records).recommend(_prefs())
+    surviving_ids = {r.record.id for r in recs}
+    assert "p/no-arena" not in surviving_ids
+    assert count == 3
 
 
 def test_context_length_filter():
