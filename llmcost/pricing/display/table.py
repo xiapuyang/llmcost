@@ -168,6 +168,8 @@ def _collect_groups(
     records: list[ModelRecord],
     input_ratio: float,
     cache_hit_ratio: float,
+    *,
+    group_by_vision: bool = True,
 ) -> list[tuple[tuple, list[ModelRecord]]]:
     """Split records into display groups, each sorted appropriately.
 
@@ -177,6 +179,8 @@ def _collect_groups(
     buckets: dict[tuple, list[ModelRecord]] = {}
     for r in records:
         key = _group_key(r)
+        if not group_by_vision and key != (None, None):
+            key = (key[0], None)
         buckets.setdefault(key, []).append(r)
 
     result = []
@@ -201,6 +205,7 @@ def render_table(
     input_ratio: float,
     cache_hit_ratio: float = 0.0,
     category: str | None = None,
+    group_by_vision: bool = True,
 ) -> None:
     """Render a rich table of model records grouped by (output, vision) and sorted by value ratio.
 
@@ -209,6 +214,7 @@ def render_table(
         input_ratio: Input token cost weight for weighted price calculation.
         cache_hit_ratio: Fraction of input tokens assumed to be cache hits (0.0–1.0).
         category: Category label for the table title (e.g. 'text', 'image').
+        group_by_vision: Whether to split groups by vision input capability.
     """
     output_ratio = 1 - input_ratio
     title = f"[bold]{category.title() if category else 'All'} Models[/bold] — "
@@ -222,6 +228,7 @@ def render_table(
     table.add_column("Provider", style="white")
     table.add_column("Input/M", justify="right", style="green")
     table.add_column("Output/M", justify="right", style="red")
+    table.add_column("$/image", justify="right", style="bold cyan")
     table.add_column("Context", justify="right")
     table.add_column("Max Out", justify="right")
     table.add_column("Weighted$/M", justify="right", style="bold yellow")
@@ -230,19 +237,21 @@ def render_table(
     table.add_column("Arena", justify="right", style="magenta")
     table.add_column("$/kArena", justify="right", style="blue")
 
-    groups = _collect_groups(records, input_ratio, cache_hit_ratio)
+    groups = _collect_groups(records, input_ratio, cache_hit_ratio, group_by_vision=group_by_vision)
     n_groups = len(groups)
 
     for g_idx, (key, group) in enumerate(groups):
         cat, has_vision = key
         if cat is None:
             header = "── no Arena score ──"
+        elif has_vision is None:
+            header = f"── {cat} ──"
         else:
             vision_label = "vision ✓" if has_vision else "vision ✗"
             header = f"── {cat} / {vision_label} ──"
 
         table.add_row(
-            f"[dim]{header}[/dim]", "", "", "", "", "", "", "", "", "", "",
+            f"[dim]{header}[/dim]", "", "", "", "", "", "", "", "", "", "", "",
         )
 
         for r_idx, r in enumerate(group):
@@ -254,21 +263,26 @@ def render_table(
             arena = str(r.arena_score) if r.arena_score is not None else "—"
             breakdown = _fmt_arena_breakdown(r.arena_scores_detail)
             vr_str = f"{vr:.3f}" if vr is not None else "—"
+            img_price = fmt_price(r.image_per_unit) if r.image_per_unit is not None else "—"
+            weighted_str = (fmt_price(weighted) + "[dim]*[/dim]") if r.image_per_unit is not None else fmt_price(weighted)
             is_last_in_group = r_idx == len(group) - 1
             table.add_row(
                 f"{flag}{display_id}",
                 r.provider_name,
                 fmt_price(r.input_per_mtok),
                 fmt_price(r.output_per_mtok),
+                img_price,
                 format_context(r.context_length),
                 format_context(r.max_output_tokens),
-                fmt_price(weighted),
+                weighted_str,
                 vision,
                 breakdown,
                 arena,
                 vr_str,
                 end_section=is_last_in_group and g_idx < n_groups - 1,
             )
+
+    has_per_image = any(r.image_per_unit is not None for _, group in groups for r in group)
 
     console.print(table)
     console.print(
@@ -279,6 +293,10 @@ def render_table(
     console.print(
         "[dim]Arena Breakdown: T=text  C=coding  V=vision  TI=text-to-image  IE=image-edit[/dim]"
     )
+    if has_per_image:
+        console.print(
+            "[dim]* Weighted$/M = token cost only; add $/image × images per request for total cost[/dim]"
+        )
 
 
 def render_drift_warnings(drifted: list[dict]) -> None:

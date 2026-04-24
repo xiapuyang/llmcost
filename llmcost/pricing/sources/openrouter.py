@@ -122,6 +122,12 @@ class OpenRouterSource(PriceSource):
         per_request_limits = item.get("per_request_limits") or None
         description = item.get("description") or None
         created = item.get("created") or None
+        canonical_slug = item.get("canonical_slug") or None
+        web_search_raw = pricing.get("web_search")
+        web_search_per_call = float(web_search_raw) if web_search_raw else None
+        knowledge_cutoff = item.get("knowledge_cutoff") or None
+        expiration_date = item.get("expiration_date") or None
+        tokenizer = item.get("architecture", {}).get("tokenizer") or None
 
         return ModelRecord(
             id=model_id,
@@ -150,4 +156,9 @@ class OpenRouterSource(PriceSource):
             per_request_limits=per_request_limits,
             description=description,
             created=created,
+            canonical_slug=canonical_slug,
+            web_search_per_call=web_search_per_call,
+            knowledge_cutoff=knowledge_cutoff,
+            expiration_date=expiration_date,
+            tokenizer=tokenizer,
         )

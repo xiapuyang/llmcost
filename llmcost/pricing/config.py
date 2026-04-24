@@ -79,6 +79,10 @@ PROVIDERS: dict[str, dict] = {
         "name": "ByteDance (Seed)",
         "pricing_url": "https://www.volcengine.com/docs/82379/1544106",
     },
+    "xiaomi": {
+        "name": "Xiaomi (MiMo)",
+        "pricing_url": "https://openrouter.ai/xiaomi",
+    },
 }
 
 # OpenRouter API endpoint — primary real-time price source

@@ -5,46 +5,6 @@
       "input": 0.21,
       "output": 0.83
     },
-    "RWKV-4-Raven-14B": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "alpaca-13b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "amazon-nova-experimental-chat-10-09": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "amazon-nova-experimental-chat-10-20": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "amazon-nova-experimental-chat-11-10": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "amazon-nova-experimental-chat-12-10": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "amazon-nova-experimental-chat-26-01-10": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "amazon-nova-experimental-chat-26-02-10": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "amazon-nova-lite-v1.0": {
       "context": "300K",
       "input": 0.06,
@@ -60,60 +20,10 @@
       "input": 0.8,
       "output": 3.2
     },
-    "athene-70b-0725": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "athene-v2-chat": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "bagel": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "c4ai-aya-expanse-32b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "c4ai-aya-expanse-8b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "c4ai-aya-vision-32b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "chatglm-6b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "chatglm2-6b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "chatglm3-6b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "chatgpt-4o-latest-20250326": {
       "context": "128K",
       "input": 5.0,
       "output": 15.0
-    },
-    "chatgpt-image-latest-high-fidelity (20251216)": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "claude-3-5-haiku-20241022": {
       "context": "200K",
@@ -245,11 +155,6 @@
       "input": 0.7,
       "output": 2.8
     },
-    "cogvlm2-llama3-chat-19b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "command-a-03-2025": {
       "context": "256K",
       "input": 2.5,
@@ -275,11 +180,6 @@
       "input": 2.5,
       "output": 10.0
     },
-    "dall-e-3": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "dbrx-instruct-preview": {
       "context": "32.8K",
       "input": 0.6,
@@ -290,11 +190,6 @@
       "input": 0.14,
       "output": 0.28
     },
-    "deepseek-llm-67b-chat": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "deepseek-r1": {
       "context": "64K",
       "input": 0.7,
@@ -304,16 +199,6 @@
       "context": "163.8K",
       "input": 0.5,
       "output": 2.15
-    },
-    "deepseek-v2.5": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "deepseek-v2.5-1210": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "deepseek-v3": {
       "context": null,
@@ -365,120 +250,15 @@
       "input": 0.25,
       "output": 0.38
     },
-    "devstral-2": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "devstral-medium-2507": {
       "context": "128K",
       "input": 0.4,
       "output": 2.0
     },
-    "dola-seed-2.0-preview": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "dola-seed-2.0-pro": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "dolly-v2-12b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "dolphin-2.2.1-mistral-7b": {
       "context": "16.4K",
       "input": 0.5,
       "output": 0.5
-    },
-    "ernie-5.0-0110": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "ernie-5.0-preview-1022": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "ernie-5.0-preview-1203": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "ernie-5.0-preview-1220": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "falcon-180b-chat": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "fastchat-t5-3b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "flux-1-dev-fp8": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "flux-1-kontext-dev": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "flux-1-kontext-max": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "flux-1-kontext-pro": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "flux-1.1-pro": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "flux-2-dev": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "flux-2-flex": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "flux-2-klein-4b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "flux-2-klein-9b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "flux-2-max": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "flux-2-pro": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "gemini-1.5-flash-001": {
       "context": "1M",
@@ -515,20 +295,10 @@
       "input": 0.07,
       "output": 0.3
     },
-    "gemini-2.0-flash-preview-image-generation": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "gemini-2.5-flash": {
       "context": "1M",
       "input": 0.3,
       "output": 2.5
-    },
-    "gemini-2.5-flash-image-preview (nano-banana)": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "gemini-2.5-flash-lite-preview-06-17-thinking": {
       "context": "1M",
@@ -565,21 +335,6 @@
       "input": 2.0,
       "output": 12.0
     },
-    "gemini-3-pro-image-preview (nano-banana-pro)": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "gemini-3-pro-image-preview-2k (nano-banana-pro)": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "gemini-3.1-flash-image-preview (nano-banana-2) [web-search]": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "gemini-3.1-flash-lite-preview": {
       "context": "1M",
       "input": 0.25,
@@ -589,11 +344,6 @@
       "context": "1M",
       "input": 2.0,
       "output": 12.0
-    },
-    "gemini-advanced-0514": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "gemini-pro": {
       "context": "32.8K",
@@ -605,11 +355,6 @@
       "input": 0.35,
       "output": 1.05
     },
-    "gemma-1.1-2b-it": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "gemma-1.1-7b-it": {
       "context": "8.2K",
       "input": 0.03,
@@ -619,11 +364,6 @@
       "context": "8.2K",
       "input": 0.65,
       "output": 0.65
-    },
-    "gemma-2-2b-it": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "gemma-2-9b-it": {
       "context": "8.2K",
@@ -660,11 +400,6 @@
       "input": 0.06,
       "output": 0.12
     },
-    "gemma-4-26b-a4b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "gemma-4-31b": {
       "context": "262.1K",
       "input": 0.14,
@@ -675,20 +410,10 @@
       "input": 0.05,
       "output": 0.08
     },
-    "glm-4-0520": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "glm-4-plus": {
       "context": "204.8K",
       "input": 0.44,
       "output": 1.76
-    },
-    "glm-4-plus-0111": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "glm-4.5": {
       "context": "131.1K",
@@ -739,11 +464,6 @@
       "context": "202.8K",
       "input": 1.2,
       "output": 4.0
-    },
-    "glm-image": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "gpt-3.5-turbo-0125": {
       "context": "16.4K",
@@ -925,26 +645,6 @@
       "input": 2.5,
       "output": 15.0
     },
-    "gpt-image-1": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "gpt-image-1-mini": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "gpt-image-1.5-high-fidelity": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "gpt-image-2 (medium)": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "gpt-oss-120b": {
       "context": "131.1K",
       "input": 0.04,
@@ -954,31 +654,6 @@
       "context": "131.1K",
       "input": 0.03,
       "output": 0.14
-    },
-    "gpt4all-13b-snoozy": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "granite-3.0-2b-instruct": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "granite-3.0-8b-instruct": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "granite-3.1-2b-instruct": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "granite-3.1-8b-instruct": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "grok-2-2024-08-13": {
       "context": "131.1K",
@@ -1025,25 +700,10 @@
       "input": 0.2,
       "output": 0.5
     },
-    "grok-4.1": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "grok-4.1-thinking": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "grok-4.20-beta-0309-reasoning": {
       "context": "2M",
       "input": 2.0,
       "output": 6.0
-    },
-    "grok-4.20-beta1": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "grok-4.20-multi-agent-beta-0309": {
       "context": "2M",
@@ -1055,121 +715,6 @@
       "input": 0.2,
       "output": 1.5
     },
-    "grok-imagine-image": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "grok-imagine-image (20260207)": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "grok-imagine-image-pro": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "grok-imagine-image-pro (20260207)": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "guanaco-33b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "hunyuan-image-3.0": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "hunyuan-image-3.0-instruct": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "hunyuan-large-2025-02-10": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "hunyuan-large-vision": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "hunyuan-standard-2025-02-10": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "hunyuan-standard-256k": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "hunyuan-standard-vision-2024-12-31": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "hunyuan-t1-20250711": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "hunyuan-turbo-0110": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "hunyuan-turbos-20250226": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "hunyuan-turbos-20250416": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "hunyuan-vision-1.5-thinking": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "ibm-granite-h-small": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "ideogram-v2": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "ideogram-v3-quality": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "imagen-3.0-generate-002": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "imagen-4.0-generate-001": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "imagen-ultra-4.0-generate-001": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "intellect-3": {
       "context": "131.1K",
       "input": 0.2,
@@ -1179,16 +724,6 @@
       "context": "32.8K",
       "input": 0.0,
       "output": 0.0
-    },
-    "internvl2-26b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "internvl2-4b": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "jamba-1.5-large": {
       "context": "256K",
@@ -1229,21 +764,6 @@
       "context": "256K",
       "input": 0.74,
       "output": 4.66
-    },
-    "kling-image-o1": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "koala-13b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "ling-flash-2.0": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "llama-13b": {
       "context": null,
@@ -1295,11 +815,6 @@
       "input": 0.02,
       "output": 0.05
     },
-    "llama-3.1-nemotron-51b-instruct": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "llama-3.1-nemotron-70b-instruct": {
       "context": "131.1K",
       "input": 1.2,
@@ -1309,16 +824,6 @@
       "context": "131.1K",
       "input": 0.6,
       "output": 1.8
-    },
-    "llama-3.1-tulu-3-70b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "llama-3.1-tulu-3-8b": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "llama-3.2-1b-instruct": {
       "context": "60K",
@@ -1330,25 +835,10 @@
       "input": 0.05,
       "output": 0.34
     },
-    "llama-3.2-vision-11b-instruct": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "llama-3.2-vision-90b-instruct": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "llama-3.3-70b-instruct": {
       "context": "131.1K",
       "input": 0.1,
       "output": 0.32
-    },
-    "llama-3.3-nemotron-49b-super-v1": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "llama-4-maverick-17b-128e-instruct": {
       "context": "131.1K",
@@ -1360,55 +850,15 @@
       "input": 0.4,
       "output": 0.7
     },
-    "llama2-70b-steerlm-chat": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "llava-onevision-qwen2-72b-ov": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "llava-v1.6-34b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "longcat-flash-chat": {
       "context": "131.1K",
       "input": 0.2,
       "output": 0.8
     },
-    "longcat-flash-chat-2602-exp": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "lucid-origin": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "magistral-medium-2506": {
       "context": "40K",
       "input": 2.0,
       "output": 5.0
-    },
-    "mai-1-preview": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "mai-image-1": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "mai-image-2": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "mercury": {
       "context": "128K",
@@ -1434,11 +884,6 @@
       "context": "1M",
       "input": 1.0,
       "output": 3.0
-    },
-    "minicpm-v-2_6": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "minimax-m1": {
       "context": "1M",
@@ -1545,36 +990,6 @@
       "input": 0.2,
       "output": 0.2
     },
-    "molmo-72b-0924": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "molmo-7b-d-0924": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "mpt-30b-chat": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "mpt-7b-chat": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "muse-spark": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "nemotron-4-340b-instruct": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "nous-hermes-2-mixtral-8x7b-dpo": {
       "context": null,
       "input": 0.9,
@@ -1594,16 +1009,6 @@
       "context": "262.1K",
       "input": 0.06,
       "output": 0.24
-    },
-    "nvidia-nemotron-3-super-120b-a12b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "nvila-internal-15b-v1": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "o1-2024-12-17": {
       "context": "200K",
@@ -1640,11 +1045,6 @@
       "input": 1.1,
       "output": 4.4
     },
-    "oasst-pythia-12b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "olmo-2-0325-32b-instruct": {
       "context": "128K",
       "input": 0.05,
@@ -1675,25 +1075,10 @@
       "input": 0.2,
       "output": 0.2
     },
-    "openchat-3.5-0106": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "openhermes-2.5-mistral-7b": {
       "context": null,
       "input": 0.17,
       "output": 0.17
-    },
-    "p-image": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "p-image-edit": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "palm-2": {
       "context": "25.8K",
@@ -1740,11 +1125,6 @@
       "input": 0.07,
       "output": 0.14
     },
-    "photon": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "pixtral-12b-2409": {
       "context": "128K",
       "input": 0.15,
@@ -1754,46 +1134,6 @@
       "context": "131.1K",
       "input": 2.0,
       "output": 6.0
-    },
-    "qwen-14b-chat": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "qwen-image": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "qwen-image-2.0-2026-03-03": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "qwen-image-2.0-pro-2026-04-22": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "qwen-image-2512": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "qwen-image-edit": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "qwen-image-edit-2511": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "qwen-image-prompt-extend": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "qwen-max-0919": {
       "context": "32.8K",
@@ -1815,30 +1155,15 @@
       "input": 0.52,
       "output": 2.08
     },
-    "qwen1.5-110b-chat": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "qwen1.5-14b-chat": {
       "context": null,
       "input": 0.3,
       "output": 0.3
     },
-    "qwen1.5-32b-chat": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "qwen1.5-4b-chat": {
       "context": null,
       "input": 0.1,
       "output": 0.1
-    },
-    "qwen1.5-72b-chat": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "qwen1.5-7b-chat": {
       "context": null,
@@ -1869,16 +1194,6 @@
       "context": "32K",
       "input": 0.87,
       "output": 0.87
-    },
-    "qwen2.5-max": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "qwen2.5-plus-1127": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "qwen2.5-vl-32b-instruct": {
       "context": "128K",
@@ -1980,16 +1295,6 @@
       "input": 0.39,
       "output": 2.34
     },
-    "qwen3.5-flash": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "qwen3.5-max-preview": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "qwen3.6-plus": {
       "context": "1M",
       "input": 0.33,
@@ -2005,160 +1310,10 @@
       "input": 0.15,
       "output": 0.58
     },
-    "recraft-v3": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "recraft-v4": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "reka-core-20240904": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "reka-flash-20240904": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "reka-flash-21b-20240226": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "reka-flash-21b-20240226-online": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "reve-edit-fast": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "reve-v1": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "reve-v1.1": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "reve-v1.1-fast": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "reve-v1.5": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "ring-flash-2.0": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "runway-gen4": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "seededit-3.0": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "seedream-3": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "seedream-4-2k": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "seedream-4-fal": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "seedream-4-high-res-fal": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "seedream-4.5": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "seedream-5.0-lite": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "smollm2-1.7b-instruct": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "snowflake-arctic-instruct": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "solar-10.7b-instruct-v1.0": {
       "context": null,
       "input": 0.3,
       "output": 0.3
-    },
-    "stable-diffusion-v35-large": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "stablelm-tuned-alpha-7b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "starling-lm-7b-alpha": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "starling-lm-7b-beta": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "step-1o-turbo-202506": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "step-1o-vision-32k-highres": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "step-1v-32k": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "step-2-16k-exp-202412": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "step-3": {
       "context": "65.5K",
@@ -2170,11 +1325,6 @@
       "input": 0.1,
       "output": 0.3
     },
-    "step1x-edit": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "stripedhyena-nous-7b": {
       "context": null,
       "input": 0.2,
@@ -2184,11 +1334,6 @@
       "context": "131K",
       "input": 0.15,
       "output": 0.45
-    },
-    "tulu-2-dpo-70b": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "vicuna-13b": {
       "context": null,
@@ -2205,103 +1350,39 @@
       "input": 0.2,
       "output": 0.2
     },
-    "wan2.5-i2i-preview": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "wan2.5-t2i-preview": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "wan2.6-image": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "wan2.6-t2i": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "wan2.7-image": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "wan2.7-image-pro": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "wizardlm-13b": {
       "context": null,
       "input": 0.3,
       "output": 0.3
-    },
-    "wizardlm-70b": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "yi-1.5-34b-chat": {
-      "context": null,
-      "input": null,
-      "output": null
     },
     "yi-34b-chat": {
       "context": "4.1K",
       "input": 0.9,
       "output": 0.9
     },
-    "yi-lightning": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "yi-vision": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "z-image-turbo": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
-    "zephyr-7b-alpha": {
-      "context": null,
-      "input": null,
-      "output": null
-    },
     "zephyr-7b-beta": {
       "context": "16.4K",
       "input": 0.15,
       "output": 0.15
-    },
-    "zephyr-orpo-141b-A35b-v0.1": {
-      "context": null,
-      "input": null,
-      "output": null
     }
   },
   "coding": {
     "KAT-Coder-Pro-V1": 1258,
-    "claude-haiku-4-5-20251001": 1315,
+    "claude-haiku-4-5-20251001": 1316,
     "claude-opus-4-1-20250805": 1385,
     "claude-opus-4-5-20251101": 1468,
     "claude-opus-4-5-20251101-thinking-32k": 1491,
     "claude-opus-4-6": 1545,
     "claude-opus-4-6-thinking": 1552,
     "claude-opus-4-7": 1566,
-    "claude-opus-4-7-thinking": 1576,
+    "claude-opus-4-7-thinking": 1572,
     "claude-sonnet-4-5-20250929": 1386,
     "claude-sonnet-4-5-20250929-thinking-32k": 1388,
-    "claude-sonnet-4-6": 1526,
-    "deepseek-v3.2": 1331,
+    "claude-sonnet-4-6": 1527,
+    "deepseek-v3.2": 1332,
     "deepseek-v3.2-exp": 1286,
     "deepseek-v3.2-thinking": 1368,
+    "deepseek-v4-pro-thinking": 1456,
     "devstral-2": 1199,
     "devstral-medium-2507": 1091,
     "gemini-2.5-pro": 1203,
@@ -2309,10 +1390,10 @@
     "gemini-3-flash (thinking-minimal)": 1389,
     "gemini-3-pro": 1438,
     "gemini-3.1-flash-lite-preview": 1235,
-    "gemini-3.1-pro-preview": 1456,
-    "glm-4.6": 1354,
+    "gemini-3.1-pro-preview": 1457,
+    "glm-4.6": 1355,
     "glm-4.7": 1440,
-    "glm-5": 1436,
+    "glm-5": 1435,
     "glm-5.1": 1534,
     "gpt-5-medium": 1393,
     "gpt-5.1": 1339,
@@ -2330,25 +1411,25 @@
     "grok-4.1-thinking": 1208,
     "grok-4.20-beta-0309-reasoning": 1403,
     "grok-code-fast-1": 1139,
-    "kimi-k2-thinking-turbo": 1330,
+    "kimi-k2-thinking-turbo": 1329,
     "kimi-k2.5-instant": 1408,
     "kimi-k2.5-thinking": 1430,
     "kimi-k2.6": 1529,
     "mercury-2": 1165,
     "mimo-v2-flash (non-thinking)": 1337,
-    "mimo-v2-flash (thinking)": 1300,
+    "mimo-v2-flash (thinking)": 1301,
     "mimo-v2-pro": 1426,
     "minimax-m2": 1304,
     "minimax-m2.1-preview": 1392,
     "minimax-m2.5": 1384,
-    "minimax-m2.7": 1417,
+    "minimax-m2.7": 1416,
     "mistral-large-3": 1223,
-    "muse-spark": 1513,
+    "muse-spark": 1512,
     "qwen3-coder-480b-a35b-instruct": 1281,
     "qwen3.5-122b-a10b": 1363,
-    "qwen3.5-27b": 1346,
+    "qwen3.5-27b": 1345,
     "qwen3.5-35b-a3b": 1248,
-    "qwen3.5-397b-a17b": 1389,
+    "qwen3.5-397b-a17b": 1388,
     "qwen3.5-flash": 1236,
     "qwen3.6-plus": 1471
   },
@@ -2435,14 +1516,14 @@
     "claude-opus-4-5-20251101": 1469,
     "claude-opus-4-5-20251101-thinking-32k": 1473,
     "claude-opus-4-6": 1496,
-    "claude-opus-4-6-thinking": 1502,
+    "claude-opus-4-6-thinking": 1503,
     "claude-opus-4-7": 1494,
     "claude-opus-4-7-thinking": 1503,
     "claude-sonnet-4-20250514": 1389,
     "claude-sonnet-4-20250514-thinking-32k": 1399,
     "claude-sonnet-4-5-20250929": 1452,
     "claude-sonnet-4-5-20250929-thinking-32k": 1453,
-    "claude-sonnet-4-6": 1462,
+    "claude-sonnet-4-6": 1463,
     "codellama-34b-instruct": 1136,
     "codellama-70b-instruct": 1118,
     "command-a-03-2025": 1354,
@@ -2467,6 +1548,10 @@
     "deepseek-v3.2-exp": 1423,
     "deepseek-v3.2-exp-thinking": 1425,
     "deepseek-v3.2-thinking": 1422,
+    "deepseek-v4-flash": 1433,
+    "deepseek-v4-flash-thinking": 1439,
+    "deepseek-v4-pro": 1463,
+    "deepseek-v4-pro-thinking": 1462,
     "dola-seed-2.0-pro": 1460,
     "dolly-v2-12b": 979,
     "dolphin-2.2.1-mistral-7b": 1151,
@@ -2488,7 +1573,7 @@
     "gemini-2.5-flash-preview-09-2025": 1405,
     "gemini-2.5-pro": 1448,
     "gemini-3-flash": 1474,
-    "gemini-3-flash (thinking-minimal)": 1462,
+    "gemini-3-flash (thinking-minimal)": 1463,
     "gemini-3-pro": 1486,
     "gemini-3.1-flash-lite-preview": 1439,
     "gemini-3.1-pro-preview": 1493,
@@ -2519,8 +1604,8 @@
     "glm-4.6v": 1378,
     "glm-4.7": 1443,
     "glm-4.7-flash": 1368,
-    "glm-5": 1458,
-    "glm-5.1": 1468,
+    "glm-5": 1457,
+    "glm-5.1": 1470,
     "gpt-3.5-turbo-0125": 1223,
     "gpt-3.5-turbo-1106": 1202,
     "gpt-4-0125-preview": 1313,
@@ -2536,19 +1621,19 @@
     "gpt-4o-2024-08-06": 1335,
     "gpt-4o-mini-2024-07-18": 1317,
     "gpt-5-chat": 1426,
-    "gpt-5-high": 1434,
+    "gpt-5-high": 1433,
     "gpt-5-mini-high": 1390,
     "gpt-5-nano-high": 1337,
     "gpt-5.1": 1439,
     "gpt-5.1-high": 1455,
     "gpt-5.2": 1439,
-    "gpt-5.2-chat-latest-20260210": 1477,
+    "gpt-5.2-chat-latest-20260210": 1476,
     "gpt-5.2-high": 1440,
-    "gpt-5.3-chat-latest": 1451,
+    "gpt-5.3-chat-latest": 1450,
     "gpt-5.4": 1467,
-    "gpt-5.4-high": 1482,
-    "gpt-5.4-mini-high": 1458,
-    "gpt-5.4-nano-high": 1404,
+    "gpt-5.4-high": 1481,
+    "gpt-5.4-mini-high": 1457,
+    "gpt-5.4-nano-high": 1405,
     "gpt-oss-120b": 1353,
     "gpt-oss-20b": 1317,
     "gpt4all-13b-snoozy": 1065,
@@ -2567,9 +1652,9 @@
     "grok-4-fast-reasoning": 1404,
     "grok-4.1": 1461,
     "grok-4.1-thinking": 1469,
-    "grok-4.20-beta-0309-reasoning": 1480,
+    "grok-4.20-beta-0309-reasoning": 1479,
     "grok-4.20-beta1": 1482,
-    "grok-4.20-multi-agent-beta-0309": 1475,
+    "grok-4.20-multi-agent-beta-0309": 1476,
     "guanaco-33b": 1126,
     "hunyuan-large-2025-02-10": 1326,
     "hunyuan-large-vision": 1294,
@@ -2581,7 +1666,7 @@
     "hunyuan-turbos-20250416": 1382,
     "hunyuan-vision-1.5-thinking": 1396,
     "ibm-granite-h-small": 1287,
-    "intellect-3": 1357,
+    "intellect-3": 1356,
     "internlm2_5-20b-chat": 1191,
     "jamba-1.5-large": 1288,
     "jamba-1.5-mini": 1239,
@@ -2589,8 +1674,8 @@
     "kimi-k2-0905-preview": 1418,
     "kimi-k2-thinking-turbo": 1430,
     "kimi-k2.5-instant": 1432,
-    "kimi-k2.5-thinking": 1450,
-    "kimi-k2.6": 1459,
+    "kimi-k2.5-thinking": 1449,
+    "kimi-k2.6": 1458,
     "koala-13b": 1070,
     "ling-flash-2.0": 1346,
     "llama-13b": 972,
@@ -2616,18 +1701,18 @@
     "llama-4-scout-17b-16e-instruct": 1322,
     "llama2-70b-steerlm-chat": 1154,
     "longcat-flash-chat": 1401,
-    "longcat-flash-chat-2602-exp": 1432,
+    "longcat-flash-chat-2602-exp": 1434,
     "magistral-medium-2506": 1303,
     "mai-1-preview": 1392,
     "mercury": 1306,
-    "mercury-2": 1346,
+    "mercury-2": 1347,
     "mimo-v2-flash (non-thinking)": 1393,
     "mimo-v2-flash (thinking)": 1387,
-    "mimo-v2-pro": 1446,
+    "mimo-v2-pro": 1448,
     "minimax-m1": 1363,
     "minimax-m2": 1346,
     "minimax-m2.1-preview": 1385,
-    "minimax-m2.5": 1400,
+    "minimax-m2.5": 1399,
     "minimax-m2.7": 1403,
     "ministral-8b-2410": 1237,
     "mistral-7b-instruct": 1109,
@@ -2638,7 +1723,7 @@
     "mistral-large-3": 1415,
     "mistral-medium": 1222,
     "mistral-medium-2505": 1387,
-    "mistral-medium-2508": 1410,
+    "mistral-medium-2508": 1409,
     "mistral-small-24b-instruct-2501": 1274,
     "mistral-small-2506": 1357,
     "mistral-small-3.1-24b-instruct-2503": 1303,
@@ -2650,7 +1735,7 @@
     "molmo-2-8b": 1328,
     "mpt-30b-chat": 1149,
     "mpt-7b-chat": 1061,
-    "muse-spark": 1490,
+    "muse-spark": 1492,
     "nemotron-4-340b-instruct": 1277,
     "nous-hermes-2-mixtral-8x7b-dpo": 1164,
     "nova-2-lite": 1337,
@@ -2667,7 +1752,7 @@
     "oasst-pythia-12b": 1021,
     "olmo-2-0325-32b-instruct": 1251,
     "olmo-3-32b-think": 1305,
-    "olmo-3.1-32b-instruct": 1330,
+    "olmo-3.1-32b-instruct": 1331,
     "olmo-3.1-32b-think": 1285,
     "olmo-7b-instruct": 1074,
     "openchat-3.5": 1181,
@@ -2676,7 +1761,7 @@
     "palm-2": 1137,
     "phi-3-medium-4k-instruct": 1197,
     "phi-3-mini-128k-instruct": 1128,
-    "phi-3-mini-4k-instruct": 1128,
+    "phi-3-mini-4k-instruct": 1127,
     "phi-3-mini-4k-instruct-june-2024": 1142,
     "phi-3-small-8k-instruct": 1170,
     "phi-4": 1256,
@@ -2712,15 +1797,15 @@
     "qwen3.5-27b": 1405,
     "qwen3.5-35b-a3b": 1395,
     "qwen3.5-397b-a17b": 1446,
-    "qwen3.5-flash": 1398,
-    "qwen3.5-max-preview": 1467,
-    "qwen3.6-plus": 1446,
+    "qwen3.5-flash": 1397,
+    "qwen3.5-max-preview": 1466,
+    "qwen3.6-plus": 1447,
     "qwq-32b": 1336,
     "qwq-32b-preview": 1156,
     "reka-core-20240904": 1287,
     "reka-flash-20240904": 1271,
     "reka-flash-21b-20240226": 1226,
-    "reka-flash-21b-20240226-online": 1233,
+    "reka-flash-21b-20240226-online": 1232,
     "ring-flash-2.0": 1321,
     "smollm2-1.7b-instruct": 1114,
     "snowflake-arctic-instruct": 1179,

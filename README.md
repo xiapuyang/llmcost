@@ -39,38 +39,92 @@ playwright install chromium
 
 ## Usage
 
+The CLI has two subcommands:
+
+```
+llmcost price      # full comparison table with filters
+llmcost recommend  # interactive wizard or non-interactive --use-case
+```
+
+### `llmcost price` — comparison table
+
 ```bash
 # Default view: text models, Arena score >= 1300, weighted price <= $10/M, 50% cache hit assumed
-llmcost
+llmcost price
 
 # Force re-fetch all sources (OpenRouter, scrapers, Arena scores)
-llmcost --refresh
+llmcost price --refresh
 
 # Adjust for your workload
-llmcost --cache-hit-ratio 0         # stateless calls, no prompt cache
-llmcost --input-ratio 0.3           # output-heavy (e.g. document generation)
+llmcost price --cache-hit-ratio 0         # stateless calls, no prompt cache
+llmcost price --input-ratio 0.3           # output-heavy (e.g. document generation)
 
 # Filter by provider (aliases supported)
-llmcost --provider claude
-llmcost --provider claude,openai,deepseek
+llmcost price --provider claude
+llmcost price --provider claude,openai,deepseek
 
 # Filter by capability
-llmcost --vision-in                 # models that accept image input
-llmcost --output image              # image generation models only
+llmcost price --vision-in                 # models that accept image input
+llmcost price --output image              # image generation models only
 
 # Adjust quality/price thresholds
-llmcost --min-arena-score 1350
-llmcost --max-price 5.0
-llmcost --min-arena-score 0 --max-price 0   # no filters
+llmcost price --min-arena-score 1350
+llmcost price --max-price 5.0
+llmcost price --min-arena-score 0 --max-price 0   # no filters
 
 # Include normally-hidden models
-llmcost --show-all                  # include blacklisted models (marked ⚠)
-llmcost --show-pinned               # include date-pinned and superseded previews
-llmcost --show-opensource           # include open-weights models without Arena score
+llmcost price --show-all                  # include blacklisted models (marked ⚠)
+llmcost price --show-pinned               # include date-pinned and superseded previews
+llmcost price --show-opensource           # include open-weights models without Arena score
 
 # Export
-llmcost --export report.md
+llmcost price --export report.md
 ```
+
+### `llmcost recommend` — model recommendation
+
+Interactive wizard (answers a few questions then prints Best Value / Balanced / Best Quality picks):
+
+```bash
+llmcost recommend
+```
+
+Non-interactive with `--use-case` for scripting or CI:
+
+```bash
+# Common use cases
+llmcost recommend --use-case chat
+llmcost recommend --use-case coding
+llmcost recommend --use-case code_review
+llmcost recommend --use-case rag_qa
+llmcost recommend --use-case long_context_qa
+llmcost recommend --use-case summarization
+llmcost recommend --use-case translation
+llmcost recommend --use-case structured_extraction
+llmcost recommend --use-case classification
+llmcost recommend --use-case chain_of_thought_reasoning
+llmcost recommend --use-case math_science_solving
+llmcost recommend --use-case text-to-image
+llmcost recommend --use-case "image editing"
+```
+
+Combine with filters to narrow results:
+
+```bash
+# Budget coding model, US providers only, max $2/M
+llmcost recommend --use-case coding --model-source us --max-price 2.0
+
+# Vision-capable chat model with at least 64 K context
+llmcost recommend --use-case chat --vision-in --min-context-length 65536
+
+# Chinese providers only, no price cap
+llmcost recommend --use-case summarization --model-source cn
+
+# Require the provider to publish cache read pricing
+llmcost recommend --use-case rag_qa --require-cache-pricing
+```
+
+Each recommendation prints three picks — **Best Value** (lowest $/kArena), **Best Quality** (highest Arena score), and **Balanced** (geometric midpoint) — along with the equivalent `llmcost price` command so you can inspect the full shortlist.
 
 ### Provider aliases
 
@@ -86,6 +140,52 @@ llmcost --export report.md
 | `glm` | `zhipu` |
 | `qwen` / `ali` / `aliyun` | `dashscope` |
 | `doubao` / `seed` | `bytedance-seed` |
+
+## Recommended configurations
+
+Tune `--input-ratio` and `--cache-hit-ratio` to match your actual workload — the defaults (70 % input, 50 % cache) suit interactive chat but can be misleading for other patterns.
+
+### By workload type
+
+| Workload | Recommended flags | Why |
+|----------|-------------------|-----|
+| Interactive chat | _(defaults)_ | ~70 % input tokens, moderate cache reuse |
+| Stateless API calls | `--cache-hit-ratio 0` | No system-prompt cache benefit |
+| Document / code generation | `--input-ratio 0.3` | Output tokens dominate; penalise high output prices |
+| Long-context RAG | `--cache-hit-ratio 0.8` | Large, stable context re-read on every call |
+| Vision tasks | `--vision-in` | Filters to models that accept image input |
+| Image generation | `--output image` | Shows text-to-image / image-edit models only |
+
+### By quality tier
+
+| Tier | Recommended flags | Typical $/kArena |
+|------|-------------------|-----------------|
+| Budget (high volume) | `--min-arena-score 1300 --max-price 2.0` | < 0.05 |
+| Balanced (default) | `--min-arena-score 1300 --max-price 10.0` | 0.05 – 0.3 |
+| Premium (quality-first) | `--min-arena-score 1380 --max-price 0` | any |
+| Frontier (no filter) | `--min-arena-score 0 --max-price 0` | — |
+
+### By provider focus
+
+```bash
+# Western frontier models only
+llmcost price --provider claude,openai,google,deepseek,x-ai
+
+# Chinese providers (often better value at similar quality)
+llmcost price --provider zhipu,minimax,kimi,dashscope
+
+# Free / open-weights survey (no Arena filter)
+llmcost price --show-opensource --min-arena-score 0
+```
+
+### Interpreting the $/kArena column
+
+**$/kArena** (weighted price ÷ Arena score × 1000) is the primary sort key — lower means more quality per dollar. Use it as a starting shortlist, then check:
+
+- **Context** — a cheaper model with 8 K context is useless for long-document tasks.
+- **Max output** — document generation needs a large max-output window.
+- **Vision-in** — required for multimodal pipelines.
+- **Provider availability** — Chinese providers may require separate API keys and have different latency profiles.
 
 ## How it works
 

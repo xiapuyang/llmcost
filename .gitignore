@@ -16,6 +16,8 @@ env/
 # AI assistant context files (local dev tooling)
 CLAUDE.md
 docs/superpowers/
+docs/plans/
+.context/
 
 # IDE
 .idea/
