@@ -108,8 +108,10 @@ def display_filter_summary(
     category = "image" if prefs.use_case in {"text-to-image", "image editing"} else "text"
     t.add_row("use_case", f"{prefs.use_case}  →  category={category}")
 
-    # Token ratio
-    ratio_label = f"{int(prefs.input_ratio * 10)}:{int((1 - prefs.input_ratio) * 10)}"
+    # Token ratio — use :g to strip trailing zeros (e.g. 7.5:2.5, not 7:2)
+    in_n = round(prefs.input_ratio * 10, 1)
+    out_n = round((1 - prefs.input_ratio) * 10, 1)
+    ratio_label = f"{in_n:g}:{out_n:g}"
     src = f"  [{prefs.input_ratio_source}]"
     t.add_row("input_ratio", f"{ratio_label}{src}  (cache_hit_ratio={prefs.cache_hit_ratio:.0%})")
 

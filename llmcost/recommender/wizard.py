@@ -6,60 +6,85 @@ import sys
 from dataclasses import dataclass, field
 
 import questionary
-from questionary import Choice
+from questionary import Choice, Separator
 
 from llmcost.pricing.config import PROVIDERS
+from llmcost.pricing.filters.pipeline import CN_PROVIDERS
 
-# ── Use-case constants ─────────────────────────────────────────────────────
-USE_CASES = [
-    "Hermes (tool calling / function agent)",
-    "OpenClaw (agent framework)",
-    "chat",
-    "summarization",
-    "translation",
-    "coding",
-    "document writing",
-    "text-to-image",
-    "image editing",
+# ── Use-case registry (single source of truth) ────────────────────────────
+@dataclass(frozen=True)
+class UseCaseDef:
+    """Definition of a use case and its token-ratio defaults."""
+
+    id: str
+    desc: str
+    input_token_ratio: float
+    cache_hit_ratio: float
+    vision_default: bool = False
+    default_context_length: int | None = None
+
+
+_USE_CASE_REGISTRY: list[tuple[str, list[UseCaseDef]]] = [
+    ("Agent / tool use", [
+        UseCaseDef("Hermes",   "tool calling / function agent", 0.92, 0.60, vision_default=True, default_context_length=256_000),
+        UseCaseDef("OpenClaw", "multi-turn agent framework",    0.85, 0.45, vision_default=True, default_context_length=256_000),
+    ]),
+    ("QA / extraction", [
+        UseCaseDef("rag_qa",               "retrieval-augmented QA",                   0.88, 0.25, default_context_length=256_000),
+        UseCaseDef("long_context_qa",      "fixed doc loaded once, queried repeatedly", 0.90, 0.85, default_context_length=256_000),
+        UseCaseDef("structured_extraction","document → structured JSON fields",          0.95, 0.15, default_context_length=256_000),
+        UseCaseDef("classification",       "text → label",                               0.97, 0.55),
+    ]),
+    ("Code", [
+        UseCaseDef("coding",          "code completion / generation",      0.70, 0.50, default_context_length=256_000),
+        UseCaseDef("code_review",     "diff + context → review comments",  0.80, 0.30, default_context_length=128_000),
+        UseCaseDef("test_generation", "function → test suite",             0.55, 0.40, default_context_length=128_000),
+    ]),
+    ("Conversation", [
+        UseCaseDef("chat",             "conversational assistant",                  0.75, 0.20, vision_default=True),
+        UseCaseDef("customer_support", "support bot with long fixed system prompt", 0.82, 0.80, vision_default=True),
+        UseCaseDef("roleplay_creative","character / story generation",              0.35, 0.65, default_context_length=128_000),
+        UseCaseDef("email_drafting",   "short instruction → full email",            0.30, 0.20),
+    ]),
+    ("Transform", [
+        UseCaseDef("summarization",   "long document → concise summary",  0.92, 0.10, default_context_length=256_000),
+        UseCaseDef("translation",     "source text → target language",    0.55, 0.15, default_context_length=128_000),
+        UseCaseDef("document writing","short instruction → long document", 0.25, 0.10),
+    ]),
+    ("Reasoning", [
+        UseCaseDef("chain_of_thought_reasoning", "step-by-step reasoning (thinking tokens)", 0.12, 0.30),
+        UseCaseDef("math_science_solving",       "problem → detailed solution",              0.10, 0.25),
+    ]),
+    ("Image", [
+        UseCaseDef("text-to-image", "text prompt → image",                0.50, 0.10),
+        UseCaseDef("image editing", "image + instruction → edited image", 0.50, 0.10, vision_default=True),
+    ]),
 ]
 
+# Derived constants
+USE_CASES = [uc.id for _, cases in _USE_CASE_REGISTRY for uc in cases]
 IMAGE_USE_CASES = {"text-to-image", "image editing"}
-
-# Default input_ratio per use case when Q1.6 samples are skipped.
-_USE_CASE_RATIO_DEFAULTS: dict[str, float] = {
-    "Hermes (tool calling / function agent)": 0.7,
-    "OpenClaw (agent framework)": 0.7,
-    "chat": 0.7,
-    "summarization": 0.9,
-    "translation": 0.5,
-    "coding": 0.7,
-    "document writing": 0.3,
+_USE_CASE_RATIO_DEFAULTS: dict[str, UseCaseDef] = {
+    uc.id: uc for _, cases in _USE_CASE_REGISTRY for uc in cases
 }
 
-# Map ratio value → display label (for Q2 select)
-_RATIO_OPTIONS: list[tuple[str, float]] = [
-    ("3:7  short input, long output (creative writing)", 0.3),
-    ("5:5  equal length (translation)", 0.5),
-    ("7:3  balanced", 0.7),
-    ("9:1  long input, short output (summarization / RAG)", 0.9),
-]
+
+def _use_case_choices() -> list:
+    choices: list = []
+    for group, cases in _USE_CASE_REGISTRY:
+        choices.append(Separator(f"── {group} ──"))
+        for uc in cases:
+            choices.append(Choice(title=f"{uc.id:<30}{uc.desc}", value=uc.id))
+    return choices
 
 # Context length options
 _CONTEXT_OPTIONS: list[tuple[str, int | None]] = [
-    ("No requirement (default)", None),
-    ("≥ 64K", 64_000),
+    ("No requirement", None),
+    ("≥ 64K",  64_000),
     ("≥ 128K", 128_000),
     ("≥ 256K", 256_000),
     ("≥ 384K", 384_000),
-    ("≥ 1M", 1_000_000),
-]
-
-# Cache hit ratio options
-_CACHE_OPTIONS: list[tuple[str, float]] = [
-    ("0%", 0.0),
-    ("25%", 0.25),
-    ("50% (default)", 0.5),
-    ("75%", 0.75),
+    ("≥ 1M",   1_000_000),
 ]
 
 # Arena score threshold options
@@ -88,7 +113,7 @@ class UserPreferences:
     use_case: str = "chat"
     vision_input: bool = False
     input_ratio: float = 0.7
-    input_ratio_source: str = "preset"  # "preset" | "sample"
+    input_ratio_source: str = "preset"  # "preset" | "blended" | "sample"
     min_context_length: int | None = None
     model_source: str = "any"  # "any" | "cn" | "us"
     cache_hit_ratio: float = 0.5
@@ -119,42 +144,50 @@ class RecommendWizard:
         use_case = self._ask(
             questionary.select(
                 "Q1. Select your use case:",
-                choices=USE_CASES,
+                choices=_use_case_choices(),
                 default="chat",
             )
         )
         prefs.use_case = use_case
+        _uc = _USE_CASE_RATIO_DEFAULTS.get(use_case)
+        if _uc is not None:
+            prefs.input_ratio = _uc.input_token_ratio
+            prefs.cache_hit_ratio = _uc.cache_hit_ratio
 
-        # Q1.5: Vision input
+        # Q1.5: Vision input — default from use-case definition
+        vision_default = _uc.vision_default if _uc else False
         vision_answer = self._ask(
             questionary.select(
                 "Q1.5. Does your input include images?",
-                choices=["No (default)", "Yes"],
-                default="No (default)",
+                choices=["No", "Yes"],
+                default="Yes" if vision_default else "No",
             )
         )
         prefs.vision_input = vision_answer == "Yes"
 
-        # Q1.6: Optional sample input/output (skipped for image use cases and when vision_input=True)
+        # Q1.6: Optional sample input/output (blended 1:1 with use-case preset)
         is_image_use_case = use_case in IMAGE_USE_CASES
         if not is_image_use_case and not prefs.vision_input:
-            input_ratio = self._collect_samples()
-            if input_ratio is not None:
-                prefs.input_ratio = input_ratio
-                prefs.input_ratio_source = "sample"
+            sampled = self._collect_samples()
+            if sampled is not None:
+                prefs.input_ratio = (prefs.input_ratio + sampled) / 2
+                prefs.input_ratio_source = "blended"
             else:
-                prefs.input_ratio = self._ask_token_ratio(use_case)
                 prefs.input_ratio_source = "preset"
         else:
-            prefs.input_ratio = _USE_CASE_RATIO_DEFAULTS.get(use_case, 0.7)
             prefs.input_ratio_source = "preset"
 
-        # Q3: Context length
+        # Q3: Context length — default from use-case definition
+        ctx_default = _uc.default_context_length if _uc else None
+        ctx_default_label = next(
+            (label for label, val in _CONTEXT_OPTIONS if val == ctx_default),
+            _CONTEXT_OPTIONS[0][0],
+        )
         context_label = self._ask(
             questionary.select(
                 "Q3. Minimum context length requirement:",
                 choices=[label for label, _ in _CONTEXT_OPTIONS],
-                default="No requirement (default)",
+                default=ctx_default_label,
             )
         )
         prefs.min_context_length = dict(_CONTEXT_OPTIONS)[context_label]
@@ -169,16 +202,6 @@ class RecommendWizard:
         )
         prefs.model_source = {"Any (default)": "any", "US / International": "us", "China only": "cn"}[source_label]
 
-        # Q5: Cache hit ratio
-        cache_label = self._ask(
-            questionary.select(
-                "Q5. Estimated cache hit ratio:",
-                choices=[label for label, _ in _CACHE_OPTIONS],
-                default="50% (default)",
-            )
-        )
-        prefs.cache_hit_ratio = dict(_CACHE_OPTIONS)[cache_label]
-
         # Q6: Min Arena score
         arena_label = self._ask(
             questionary.select(
@@ -189,12 +212,18 @@ class RecommendWizard:
         )
         prefs.min_arena_score = dict(_ARENA_OPTIONS)[arena_label]
 
-        # Q7: Provider subset
+        # Q7: Provider subset — pre-check based on Q4 model source
         all_providers = list(PROVIDERS.keys())
+        if prefs.model_source == "cn":
+            default_checked = {p for p in all_providers if p in CN_PROVIDERS}
+        elif prefs.model_source == "us":
+            default_checked = {p for p in all_providers if p not in CN_PROVIDERS}
+        else:
+            default_checked = set(all_providers)
         selected = self._ask(
             questionary.checkbox(
                 "Q7. Select providers to include (Space to toggle, Enter to confirm):",
-                choices=[Choice(p, checked=True) for p in all_providers],
+                choices=[Choice(p, checked=(p in default_checked)) for p in all_providers],
             )
         )
         prefs.providers = selected if selected else None
@@ -223,7 +252,7 @@ class RecommendWizard:
 
         first_input = self._ask(
             questionary.text(
-                "Q1.6. Optional: paste a typical input sample to estimate token ratio (Enter to skip):"
+                "Q1.6. Paste a typical input sample for better accuracy (Enter to skip and use preset):"
             )
         )
         if not first_input:
@@ -246,29 +275,6 @@ class RecommendWizard:
         if total == 0:
             return None
         return in_chars_total / total
-
-    def _ask_token_ratio(self, use_case: str) -> float:
-        """Ask Q2 (token ratio select) with a use-case-specific default cursor.
-
-        Args:
-            use_case: The selected use case from Q1.
-
-        Returns:
-            Selected input_ratio float.
-        """
-        default_ratio = _USE_CASE_RATIO_DEFAULTS.get(use_case, 0.7)
-        default_label = next(
-            (label for label, val in _RATIO_OPTIONS if val == default_ratio),
-            _RATIO_OPTIONS[2][0],  # fall back to "7:3 balanced"
-        )
-        label = self._ask(
-            questionary.select(
-                "Q2. Input:output token ratio:",
-                choices=[label for label, _ in _RATIO_OPTIONS],
-                default=default_label,
-            )
-        )
-        return dict(_RATIO_OPTIONS)[label]
 
     @staticmethod
     def _ask(question: questionary.Question) -> object:
