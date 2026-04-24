@@ -10,15 +10,14 @@ from rich.text import Text
 
 from rich import box
 
+from llmcost.pricing.filters.pipeline import CN_PROVIDERS
 from llmcost.recommender.engine import Recommendation, ScoredCandidate
-from llmcost.recommender.wizard import UserPreferences
-
-_CN_PROVIDERS = frozenset({"zhipu", "minimax", "moonshotai", "dashscope", "bytedance-seed"})
+from llmcost.recommender.wizard import IMAGE_USE_CASES, UserPreferences
 
 
 def _format_price_command(prefs: UserPreferences) -> str:
     """Build the equivalent `llmcost price` command for these preferences."""
-    category = "image" if prefs.use_case in {"text-to-image", "image editing"} else "text"
+    category = "image" if prefs.use_case in IMAGE_USE_CASES else "text"
     parts = ["llmcost price"]
 
     parts.append(f"--input-ratio {prefs.input_ratio}")
@@ -37,7 +36,7 @@ def _format_price_command(prefs: UserPreferences) -> str:
 
     # Resolve model_source to --provider list when possible
     if prefs.model_source == "cn":
-        parts.append(f"--provider {','.join(sorted(_CN_PROVIDERS))}")
+        parts.append(f"--provider {','.join(sorted(CN_PROVIDERS))}")
     elif prefs.providers is not None:
         parts.append(f"--provider {','.join(prefs.providers)}")
 
@@ -104,7 +103,7 @@ def render_debug_candidates(
     """
     n_preferred = len(prefs.preferred_parameters)
     t = Table(
-        title="[dim]Debug: all candidates ranked by Balanced combined score (lower = better)[/dim]",
+        title="[dim]Debug: all candidates sorted by $/kArena (lower = better)[/dim]",
         box=box.SIMPLE_HEAD,
         show_lines=False,
     )
@@ -120,9 +119,15 @@ def render_debug_candidates(
 
     candidates = sorted(candidates, key=lambda c: c.value_ratio if c.value_ratio is not None else float("inf"))
 
+    unknown_ctx = prefs.min_context_length is not None
+    has_unknown_ctx_model = False
+
     for rank, c in enumerate(candidates, 1):
         r = c.record
         display_id = r.direct_id if r.direct_id else r.id.split("/")[-1]
+        if unknown_ctx and r.context_length is None:
+            display_id += " [dim]?ctx[/dim]"
+            has_unknown_ctx_model = True
         arena = str(r.arena_score) if r.arena_score is not None else "—"
         vr = f"{c.value_ratio:.3f}" if c.value_ratio is not None else "—"
         wp = f"${c.weighted_price:.3f}"
@@ -135,6 +140,11 @@ def render_debug_candidates(
         t.add_row(*row)
 
     console.print(t)
+    if has_unknown_ctx_model:
+        console.print(
+            "[dim]?ctx = context length unreported; passed min_context_length filter "
+            "because actual capacity is unknown[/dim]"
+        )
 
 
 def display_filter_summary(
@@ -156,7 +166,7 @@ def display_filter_summary(
     t.add_column()
 
     # Use case / category
-    category = "image" if prefs.use_case in {"text-to-image", "image editing"} else "text"
+    category = "image" if prefs.use_case in IMAGE_USE_CASES else "text"
     t.add_row("use_case", f"{prefs.use_case}  →  category={category}")
 
     # Token ratio — use :g to strip trailing zeros (e.g. 7.5:2.5, not 7:2)
@@ -180,7 +190,12 @@ def display_filter_summary(
     t.add_row("min_arena_score", str(prefs.min_arena_score) if prefs.min_arena_score else "0 (no limit)")
 
     # Max price
-    price = f"${prefs.max_price:.0f}/M" if prefs.max_price else "no limit"
+    if prefs.max_price_model:
+        price = f"≤ {prefs.max_price_model} price"
+    elif prefs.max_price:
+        price = f"${prefs.max_price:.0f}/M"
+    else:
+        price = "no limit"
     t.add_row("max_price", price)
 
     # Providers

@@ -23,8 +23,8 @@ class UseCaseDef:
     vision_default: bool = False
     default_context_length: int | None = None
     ask_sample_input: bool = False
-    # Models missing ANY required parameter are eliminated from recommendations.
-    # Models with supported_parameters=None (unreported) are also eliminated when non-empty.
+    # Models supporting NONE of these parameters are eliminated (OR logic: keep if any match).
+    # Models with supported_parameters=None (unreported) are kept as capability is unknown.
     required_parameters: tuple[str, ...] = ()
     # Models are ranked higher when they support more of these parameters.
     preferred_parameters: tuple[str, ...] = ()
@@ -71,7 +71,7 @@ _USE_CASE_REGISTRY: list[tuple[str, list[UseCaseDef]]] = [
     ]),
     ("Code", [
         UseCaseDef(
-            "coding", "code completion / generation", 0.70, 0.50,
+            "coding", "code completion / generation", 0.30, 0.50,
             default_context_length=256_000,
             preferred_parameters=("stop", "reasoning_effort"),
         ),
@@ -181,10 +181,10 @@ _ARENA_OPTIONS: list[tuple[str, int]] = [
 # SOTA benchmark models for max-price ceiling; (label, direct_id); empty id = no limit
 _SOTA_MODELS: list[tuple[str, str]] = [
     ("No limit",                       ""),
-    ("claude-opus-4-7 (default)",       "claude-opus-4-7"),
-    ("claude-opus-4-6",                 "claude-opus-4-6"),
-    ("gpt-5.4",                         "gpt-5.4"),
-    ("gemini-3.1-pro-preview",          "gemini-3.1-pro-preview"),
+    ("claude-opus-4.7 (default)",      "claude-opus-4.7"),
+    ("claude-opus-4.6",                "claude-opus-4.6"),
+    ("gpt-5.4",                        "gpt-5.4"),
+    ("gemini-3.1-pro-preview",         "gemini-3.1-pro-preview"),
 ]
 
 
@@ -202,9 +202,9 @@ class UserPreferences:
     min_arena_score: int = 1300
     providers: list[str] | None = None  # None means all providers
     max_price: float | None = None  # None means no limit ($/M tokens); fallback when max_price_model unresolved
-    max_price_model: str | None = "claude-opus-4-7"  # direct_id of SOTA ceiling model; None = no limit
+    max_price_model: str | None = "claude-opus-4.7"  # direct_id of SOTA ceiling model; None = no limit
     require_cache_pricing: bool = True
-    required_parameters: tuple[str, ...] = ()   # from UseCaseDef; models missing any are eliminated
+    required_parameters: tuple[str, ...] = ()   # from UseCaseDef; models supporting none are eliminated (OR)
     preferred_parameters: tuple[str, ...] = ()  # from UseCaseDef; more = higher rank
 
 
@@ -331,7 +331,7 @@ class RecommendWizard:
             questionary.select(
                 "Q. Price ceiling — exclude models costlier than:",
                 choices=[label for label, _ in _SOTA_MODELS],
-                default="claude-opus-4-7 (default)",
+                default="claude-opus-4.7 (default)",
             )
         )
         prefs.max_price_model = dict(_SOTA_MODELS)[sota_label] or None

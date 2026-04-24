@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import os
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -72,11 +74,13 @@ class CacheManager:
             "models": [r.to_dict() for r in by_id.values()],
         }
         self.cache_path.parent.mkdir(parents=True, exist_ok=True)
-        self.cache_path.write_text(json.dumps(payload, indent=2))
+        tmp = self.cache_path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        os.replace(tmp, self.cache_path)
         print(
             f"[cache] saved {len(by_id)} models ({added} new, {updated} updated,"
             f" {len(existing_records) - updated} preserved)",
-            file=__import__("sys").stderr,
+            file=sys.stderr,
         )
 
     def load(self) -> tuple[list[ModelRecord], dict[str, Any]]:
@@ -88,7 +92,11 @@ class CacheManager:
         """
         if not self.cache_path.exists():
             return [], {}
-        payload = json.loads(self.cache_path.read_text())
+        try:
+            payload = json.loads(self.cache_path.read_text())
+        except json.JSONDecodeError:
+            print("[cache] warn: cache.json is corrupt, treating as empty", file=sys.stderr)
+            return [], {}
         records = [ModelRecord.from_dict(m) for m in payload.get("models", [])]
         meta = {k: v for k, v in payload.items() if k != "models"}
         return records, meta

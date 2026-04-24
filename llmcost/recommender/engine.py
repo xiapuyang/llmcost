@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from dataclasses import dataclass
 
 from llmcost.pricing.display.table import compute_value_ratio, compute_weighted
@@ -71,10 +72,13 @@ class ModelRecommender:
         surviving = self._filter(prefs)
         surviving_count = len(surviving)
 
+        self._last_scored: list = []
+
         if surviving_count == 0:
             return [], 0
 
         scored = self._score(surviving, prefs)
+        self._last_scored = scored
 
         if surviving_count < 3:
             winner = min(scored, key=lambda t: t[2] if t[2] is not None else float("inf"))
@@ -83,7 +87,8 @@ class ModelRecommender:
                 winner[0],
                 winner[1],
                 winner[2],
-                f"Lowest $/kArena: {winner[2]:.3f} "  # type: ignore[arg-type]
+                f"Lowest $/kArena: {winner[2]:.3f} " if winner[2] is not None
+                else f"Weighted price: ${winner[1]:.2f}/M "
                 f"(only {surviving_count} model(s) matched your criteria)",
             )
             return [rec], surviving_count
@@ -103,12 +108,15 @@ class ModelRecommender:
         for r in self._records:
             slug = r.direct_id or r.id.split("/")[-1]
             if slug == model_id:
-                from llmcost.pricing.display.table import compute_weighted
                 return compute_weighted(
                     r,
                     input_ratio=prefs.input_ratio,
                     cache_hit_ratio=prefs.cache_hit_ratio,
                 )
+        print(
+            f"[warn] max_price_model {model_id!r} not found in records — price ceiling disabled",
+            file=sys.stderr,
+        )
         return prefs.max_price
 
     def _filter(self, prefs: UserPreferences) -> list[ModelRecord]:
@@ -178,9 +186,15 @@ class ModelRecommender:
 
     @staticmethod
     def _preferred_score(record: ModelRecord, preferred: tuple[str, ...]) -> float:
-        """Return the fraction of preferred parameters supported by record (0–1)."""
-        if not preferred or not record.supported_parameters:
+        """Return the fraction of preferred parameters supported by record (0–1).
+
+        Returns 0.5 when supported_parameters is None (capability unreported) to
+        avoid penalizing models whose API surface is simply not documented.
+        """
+        if not preferred:
             return 0.0
+        if record.supported_parameters is None:
+            return 0.5
         sp = set(record.supported_parameters)
         return sum(1 for p in preferred if p in sp) / len(preferred)
 
@@ -206,7 +220,8 @@ class ModelRecommender:
             best_value_item[0],
             best_value_item[1],
             best_value_item[2],
-            f"Lowest $/kArena: {best_value_item[2]:.3f}",
+            f"Lowest $/kArena: {best_value_item[2]:.3f}" if best_value_item[2] is not None
+            else f"Weighted price: ${best_value_item[1]:.2f}/M",
         )
 
         # Best Quality: highest Arena score
@@ -290,16 +305,21 @@ class ModelRecommender:
     def debug_candidates(self, prefs: UserPreferences) -> list[ScoredCandidate]:
         """Return all filtered candidates sorted by Balanced combined score for debug output.
 
+        Reuses scored results cached by the most recent recommend() call to avoid
+        redundant filtering and scoring.
+
         Args:
             prefs: User preferences (same as passed to recommend()).
 
         Returns:
             List of ScoredCandidate sorted ascending by combined_score.
         """
-        surviving = self._filter(prefs)
-        if not surviving:
-            return []
-        scored = self._score(surviving, prefs)
+        scored = getattr(self, "_last_scored", None)
+        if not scored:
+            surviving = self._filter(prefs)
+            if not surviving:
+                return []
+            scored = self._score(surviving, prefs)
         return self._compute_combined(scored)
 
     @staticmethod

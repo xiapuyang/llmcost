@@ -15,9 +15,7 @@ def _cmd_price(argv: list[str]) -> None:
 
 
 def _cmd_recommend(argv: list[str]) -> None:
-    """Run the interactive recommendation wizard."""
-    import argparse as _ap
-
+    """Run the recommendation wizard (interactive) or non-interactively via flags."""
     from rich.console import Console
 
     from llmcost.pricing.loader import load_records
@@ -27,10 +25,24 @@ def _cmd_recommend(argv: list[str]) -> None:
         render_debug_candidates,
     )
     from llmcost.recommender.engine import ModelRecommender
-    from llmcost.recommender.wizard import RecommendWizard
+    from llmcost.recommender.wizard import (
+        RecommendWizard,
+        UserPreferences,
+        _USE_CASE_RATIO_DEFAULTS,
+        USE_CASES,
+    )
 
-    p = _ap.ArgumentParser(prog="llmcost recommend", add_help=False)
-    p.add_argument("--debug", action="store_true", help="Show all candidates ranked by combined score")
+    p = argparse.ArgumentParser(prog="llmcost recommend")
+    p.add_argument("--debug", action="store_true")
+    p.add_argument("--use-case", dest="use_case", metavar="NAME",
+                   help=f"Non-interactive mode. One of: {', '.join(USE_CASES)}")
+    p.add_argument("--vision-in", dest="vision_input", action="store_true")
+    p.add_argument("--min-context-length", dest="min_context_length", type=int, metavar="N")
+    p.add_argument("--model-source", dest="model_source", choices=["any", "cn", "us"], default="any")
+    p.add_argument("--min-arena-score", dest="min_arena_score", type=int, default=0)
+    p.add_argument("--max-price", dest="max_price", type=float, metavar="DOLLARS_PER_M")
+    p.add_argument("--providers", metavar="p1,p2,...")
+    p.add_argument("--require-cache-pricing", dest="require_cache_pricing", action="store_true")
     args, _ = p.parse_known_args(argv)
 
     console = Console()
@@ -40,7 +52,29 @@ def _cmd_recommend(argv: list[str]) -> None:
     )
     total_count = len(records)
 
-    prefs = RecommendWizard().run()
+    if args.use_case is not None:
+        ucd = _USE_CASE_RATIO_DEFAULTS.get(args.use_case)
+        if ucd is None:
+            console.print(f"[red]Unknown use case: {args.use_case!r}[/red]")
+            console.print(f"[dim]Available: {', '.join(USE_CASES)}[/dim]")
+            raise SystemExit(1)
+        prefs = UserPreferences(
+            use_case=args.use_case,
+            vision_input=args.vision_input,
+            input_ratio=ucd.input_token_ratio,
+            input_ratio_source="use_case_def",
+            cache_hit_ratio=ucd.cache_hit_ratio,
+            min_context_length=args.min_context_length,
+            model_source=args.model_source,
+            min_arena_score=args.min_arena_score,
+            max_price=args.max_price,
+            providers=args.providers.split(",") if args.providers else None,
+            require_cache_pricing=args.require_cache_pricing,
+            required_parameters=ucd.required_parameters,
+            preferred_parameters=ucd.preferred_parameters,
+        )
+    else:
+        prefs = RecommendWizard().run()
 
     recommender = ModelRecommender(records)
     recommendations, surviving_count = recommender.recommend(prefs)

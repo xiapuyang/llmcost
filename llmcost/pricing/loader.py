@@ -79,6 +79,7 @@ def load_records(
             on_refresh()
         records, source_times = fetch_all()
         cache.save(records, source_times)
+        records, _ = cache.load()
         arena_scores, _prices = fetch_arena_scores()
         save_arena_scores(arena_scores, _prices)
     else:
@@ -101,6 +102,7 @@ def load_records(
                 on_refresh()
             records, source_times = fetch_all()
             cache.save(records, source_times)
+            records, _ = cache.load()
             arena_scores, _prices = fetch_arena_scores()
             save_arena_scores(arena_scores, _prices)
         else:
