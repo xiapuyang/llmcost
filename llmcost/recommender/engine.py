@@ -123,6 +123,7 @@ class ModelRecommender:
             .providers_subset(prefs.providers)
             .require_pricing()
             .require_arena_score()
+            .exclude_per_image_pricing()
             .has_cache_pricing(enabled=prefs.require_cache_pricing)
             .max_weighted_price(
                 self._resolve_max_price(prefs),

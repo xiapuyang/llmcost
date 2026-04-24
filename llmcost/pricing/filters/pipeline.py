@@ -123,6 +123,12 @@ class RecordFilter:
 
     # ── Threshold / selection filters ─────────────────────────────────────────
 
+    def exclude_per_image_pricing(self, *, enabled: bool = True) -> RecordFilter:
+        """Drop records billed per image (image_per_unit set) — weighted $/M formula does not apply."""
+        if enabled:
+            self._records = [r for r in self._records if r.image_per_unit is None]
+        return self
+
     def has_cache_pricing(self, enabled: bool = True) -> RecordFilter:
         """Keep only models that have cache_read_per_mtok set."""
         if enabled:
