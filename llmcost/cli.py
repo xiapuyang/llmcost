@@ -16,61 +16,27 @@ def _cmd_price(argv: list[str]) -> None:
 
 def _cmd_recommend(argv: list[str]) -> None:
     """Run the interactive recommendation wizard."""
-    from datetime import datetime, timezone
-
     from rich.console import Console
 
-    from llmcost.pricing.cache import CacheManager
-    from llmcost.pricing.cli import fetch_all
-    from llmcost.pricing.sources.arena_scores import (
-        apply_arena_scores,
-        fetch_arena_scores,
-        load_arena_scores,
-        save_arena_scores,
-    )
-    from llmcost.recommender.display import display_recommendations
+    from llmcost.pricing.loader import load_records
+    from llmcost.recommender.display import display_filter_summary, display_recommendations
     from llmcost.recommender.engine import ModelRecommender
     from llmcost.recommender.wizard import RecommendWizard
 
     console = Console()
-    cache = CacheManager()
-
-    records, meta = cache.load()
-    needs_refresh = not records
-
-    if not needs_refresh and records:
-        fetched_ats = [r.fetched_at for r in records if r.fetched_at]
-        if fetched_ats:
-            oldest = min(fetched_ats)
-            try:
-                dt = datetime.fromisoformat(oldest)
-                if dt.tzinfo is None:
-                    dt = dt.replace(tzinfo=timezone.utc)
-                age_days = (datetime.now(timezone.utc) - dt).days
-                needs_refresh = age_days > 30
-            except ValueError:
-                pass
-
-    if needs_refresh:
-        console.print("[dim]Refreshing pricing data…[/dim]")
-        records, source_times = fetch_all()
-        cache.save(records, source_times)
-        arena_scores, arena_prices = fetch_arena_scores()
-        save_arena_scores(arena_scores, arena_prices)
-    else:
-        arena_scores = load_arena_scores()
-        if not arena_scores:
-            arena_scores, arena_prices = fetch_arena_scores()
-            save_arena_scores(arena_scores, arena_prices)
-
-    records = cache.apply_overrides(records)
-    records = apply_arena_scores(records, arena_scores)
+    records = load_records(
+        auto_refresh_days=30,
+        on_refresh=lambda: console.print("[dim]Refreshing pricing data…[/dim]"),
+    )
+    total_count = len(records)
 
     prefs = RecommendWizard().run()
 
     recommender = ModelRecommender(records)
     recommendations, surviving_count = recommender.recommend(prefs)
 
+    console.print()
+    display_filter_summary(prefs, total_count, surviving_count, console)
     console.print()
     display_recommendations(recommendations, surviving_count, console)
 

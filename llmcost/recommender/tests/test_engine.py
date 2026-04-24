@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from llmcost.pricing.models import ModelRecord
-from llmcost.recommender.engine import CN_PROVIDERS, ModelRecommender, Recommendation
+from llmcost.pricing.filters.pipeline import CN_PROVIDERS
+from llmcost.recommender.engine import ModelRecommender, Recommendation
 from llmcost.recommender.wizard import UserPreferences
 
 

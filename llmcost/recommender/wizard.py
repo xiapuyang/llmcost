@@ -73,8 +73,8 @@ _ARENA_OPTIONS: list[tuple[str, int]] = [
 
 # Max weighted price options ($/M tokens); 0.0 means no limit
 _PRICE_OPTIONS: list[tuple[str, float]] = [
-    ("No limit (default)", 0.0),
-    ("$10/M", 10.0),
+    ("No limit", 0.0),
+    ("$10/M (default)", 10.0),
     ("$25/M", 25.0),
     ("$50/M", 50.0),
     ("$75/M", 75.0),
@@ -204,7 +204,7 @@ class RecommendWizard:
             questionary.select(
                 "Q8. Maximum weighted price ($/M tokens):",
                 choices=[label for label, _ in _PRICE_OPTIONS],
-                default="No limit (default)",
+                default="$10/M (default)",
             )
         )
         raw = dict(_PRICE_OPTIONS)[price_label]

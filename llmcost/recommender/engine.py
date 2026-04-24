@@ -5,16 +5,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from llmcost.pricing.display.table import compute_value_ratio, compute_weighted
-from llmcost.pricing.filters.arena import ArenaFilter
 from llmcost.pricing.filters.blacklist import BlacklistFilter
+from llmcost.pricing.filters.pipeline import RecordFilter
 from llmcost.pricing.models import ModelRecord
 from llmcost.recommender.wizard import UserPreferences
-
-# ── Constants ──────────────────────────────────────────────────────────────
-
-CN_PROVIDERS: frozenset[str] = frozenset(
-    {"zhipu", "minimax", "moonshotai", "dashscope", "bytedance-seed"}
-)
 
 _IMAGE_USE_CASES = {"text-to-image", "image editing"}
 
@@ -94,57 +88,25 @@ class ModelRecommender:
         Returns:
             Filtered list of ModelRecord objects.
         """
-        records = self._blacklist_filter.apply(self._records, show_all=False)
-        records = ArenaFilter(prefs.min_arena_score).apply(records)
-
-        # Drop z-ai: OpenRouter's namespace for Zhipu AI — the direct zhipu/* records are already present
-        records = [r for r in records if r.provider != "z-ai"]
-
-        # Use-case → category
         target_category = "image" if prefs.use_case in _IMAGE_USE_CASES else "text"
-        records = [r for r in records if r.category == target_category]
-
-        # Vision input
-        if prefs.vision_input:
-            records = [r for r in records if "image" in r.input_modalities]
-
-        # Context length
-        if prefs.min_context_length is not None:
-            records = [
-                r for r in records
-                if r.context_length is None or r.context_length >= prefs.min_context_length
-            ]
-
-        # Model source
-        if prefs.model_source == "cn":
-            records = [r for r in records if r.provider in CN_PROVIDERS]
-        elif prefs.model_source == "us":
-            records = [r for r in records if r.provider not in CN_PROVIDERS]
-
-        # Provider subset
-        if prefs.providers is not None:
-            records = [r for r in records if r.provider in prefs.providers]
-
-        # Require priceable records
-        records = [
-            r for r in records
-            if r.input_per_mtok is not None and r.output_per_mtok is not None
-        ]
-
-        # Max weighted price
-        if prefs.max_price is not None:
-            records = [
-                r for r in records
-                if (
-                    w := compute_weighted(
-                        r,
-                        input_ratio=prefs.input_ratio,
-                        cache_hit_ratio=prefs.cache_hit_ratio,
-                    )
-                ) is not None and w <= prefs.max_price
-            ]
-
-        return records
+        return (
+            RecordFilter(self._records)
+            .apply_blacklist(blacklist_filter=self._blacklist_filter)
+            .exclude_z_ai()
+            .min_arena_score(prefs.min_arena_score)
+            .category(target_category)
+            .vision_input_only(enabled=prefs.vision_input)
+            .min_context_length(prefs.min_context_length)
+            .model_source(prefs.model_source)
+            .providers_subset(prefs.providers)
+            .require_pricing()
+            .max_weighted_price(
+                prefs.max_price,
+                input_ratio=prefs.input_ratio,
+                cache_hit_ratio=prefs.cache_hit_ratio,
+            )
+            .build()
+        )
 
     def _score(
         self, records: list[ModelRecord], prefs: UserPreferences
