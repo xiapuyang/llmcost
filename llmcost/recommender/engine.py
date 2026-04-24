@@ -87,9 +87,11 @@ class ModelRecommender:
                 winner[0],
                 winner[1],
                 winner[2],
-                f"Lowest $/kArena: {winner[2]:.3f} " if winner[2] is not None
-                else f"Weighted price: ${winner[1]:.2f}/M "
-                f"(only {surviving_count} model(s) matched your criteria)",
+                (
+                    f"Lowest $/kArena: {winner[2]:.3f} "
+                    if winner[2] is not None
+                    else f"Weighted price: ${winner[1]:.2f}/M "
+                ) + f"(only {surviving_count} model(s) matched your criteria)",
             )
             return [rec], surviving_count
 

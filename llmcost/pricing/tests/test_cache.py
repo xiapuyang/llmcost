@@ -65,3 +65,44 @@ def test_override_unknown_model_ignored(tmp_path):
     records = [_make_record()]
     result = mgr.apply_overrides(records)
     assert result[0].input_per_mtok == 1.0  # original unchanged
+
+
+# ── Incremental merge (T1) ─────────────────────────────────────────────────
+
+def test_save_preserves_records_not_in_new_fetch(tmp_path):
+    """Records absent from the new fetch are preserved from the existing cache."""
+    mgr = CacheManager(tmp_path / "cache.json")
+    old = _make_record(id="vendor/old-model", input_per_mtok=1.0)
+    new = _make_record(id="vendor/new-model", input_per_mtok=2.0)
+
+    mgr.save([old], sources={"s": "t1"})
+    mgr.save([new], sources={"s": "t2"})
+
+    loaded, _ = mgr.load()
+    ids = {r.id for r in loaded}
+    assert "vendor/old-model" in ids
+    assert "vendor/new-model" in ids
+
+
+def test_save_overwrites_existing_record_by_id(tmp_path):
+    """A record present in the new fetch overwrites its cached counterpart."""
+    mgr = CacheManager(tmp_path / "cache.json")
+    original = _make_record(id="vendor/model", input_per_mtok=1.0)
+    updated  = _make_record(id="vendor/model", input_per_mtok=9.9)
+
+    mgr.save([original], sources={})
+    mgr.save([updated],  sources={})
+
+    loaded, _ = mgr.load()
+    assert len(loaded) == 1
+    assert loaded[0].input_per_mtok == 9.9
+
+
+def test_load_corrupt_json_returns_empty(tmp_path):
+    """A corrupted cache.json is treated as empty instead of crashing."""
+    cache_file = tmp_path / "cache.json"
+    cache_file.write_text("{invalid json{{")
+    mgr = CacheManager(cache_file)
+    records, meta = mgr.load()
+    assert records == []
+    assert meta == {}

@@ -21,7 +21,7 @@ def _default_answers(overrides: dict | None = None) -> dict:
         "source region":  "Any (default)",
         "caching":        "Yes",
         "Arena score":    "1300 (default)",
-        "ceiling":        "claude-opus-4-7 (default)",
+        "ceiling":        "claude-opus-4.7 (default)",
     }
     if overrides:
         answers.update(overrides)
@@ -109,7 +109,7 @@ def test_default_values_all_defaults():
     assert prefs.cache_hit_ratio == 0.20   # chat registry preset
     assert prefs.min_arena_score == 1300
     assert prefs.providers == all_providers
-    assert prefs.max_price_model == "claude-opus-4-7"
+    assert prefs.max_price_model == "claude-opus-4.7"
 
 
 def test_sample_blends_with_preset_ratio():
