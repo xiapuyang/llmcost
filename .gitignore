@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# AI assistant context files (local dev tooling)
+CLAUDE.md
+docs/superpowers/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# macOS
+.DS_Store

@@ -1,0 +1,167 @@
+# Manual overrides — highest priority over all sources.
+# Supported fields: input_per_mtok, output_per_mtok, cache_read_per_mtok, direct_id, notes
+# Prices in USD per million tokens.
+# create: true — inserts a new record when no fetched record exists for this id.
+
+# ── Alibaba Cloud DashScope / Qwen (International / Singapore region) ─────────
+# Source: https://www.alibabacloud.com/help/en/model-studio/model-pricing
+# Tiered pricing: using lowest tier as representative (typical agent call length).
+# qwen3-max tiers: ≤32K $1.2/$6, 32K-128K $2.4/$12, >128K $3/$15
+# qwen3.5-plus tiers: ≤256K $0.4/$2.4, >256K $0.5/$3
+# qwen-plus tiers: ≤256K $0.4/$1.2 (non-thinking), $0.4/$4 (thinking)
+# qwen3.5-flash: flat $0.1/$0.4
+# qwen-flash tiers: ≤256K $0.05/$0.4, >256K $0.25/$2
+# qwen-turbo: flat $0.05/$0.2 (non-thinking)
+
+- id: "dashscope/qwen3-max"
+  create: true
+  name: "Qwen3-Max"
+  provider: "dashscope"
+  direct_id: "qwen3-max"
+  input_per_mtok: 1.2
+  output_per_mtok: 6.0
+  context_length: 258048
+  max_output_tokens: 32768
+
+- id: "dashscope/qwen3.5-plus"
+  create: true
+  name: "Qwen3.5-Plus"
+  provider: "dashscope"
+  direct_id: "qwen3.5-plus"
+  input_per_mtok: 0.4
+  output_per_mtok: 2.4
+  context_length: 1048576
+  max_output_tokens: 32768
+
+- id: "dashscope/qwen-plus"
+  create: true
+  name: "Qwen-Plus"
+  provider: "dashscope"
+  direct_id: "qwen-plus"
+  input_per_mtok: 0.4
+  output_per_mtok: 1.2
+  context_length: 1048576
+  max_output_tokens: 8192
+
+- id: "dashscope/qwen3.5-flash"
+  create: true
+  name: "Qwen3.5-Flash"
+  provider: "dashscope"
+  direct_id: "qwen3.5-flash"
+  input_per_mtok: 0.1
+  output_per_mtok: 0.4
+  context_length: 1048576
+  max_output_tokens: 8192
+
+- id: "dashscope/qwen-flash"
+  create: true
+  name: "Qwen-Flash"
+  provider: "dashscope"
+  direct_id: "qwen-flash"
+  input_per_mtok: 0.05
+  output_per_mtok: 0.4
+  context_length: 1048576
+  max_output_tokens: 8192
+
+- id: "dashscope/qwen-turbo"
+  create: true
+  name: "Qwen-Turbo"
+  provider: "dashscope"
+  direct_id: "qwen-turbo"
+  input_per_mtok: 0.05
+  output_per_mtok: 0.2
+  context_length: 131072
+  max_output_tokens: 8192
+
+# DeepSeek direct API pricing (api.deepseek.com) — both chat and reasoner share same token prices
+# Source: https://api-docs.deepseek.com/quick_start/pricing
+- id: "deepseek/deepseek-chat"
+  direct_id: "deepseek-chat"
+  input_per_mtok: 0.28
+  output_per_mtok: 0.42
+  cache_read_per_mtok: 0.028
+  context_length: 131072
+  max_output_tokens: 8192
+
+- id: "deepseek/deepseek-r1"
+  direct_id: "deepseek-reasoner"
+  input_per_mtok: 0.28
+  output_per_mtok: 0.42
+  cache_read_per_mtok: 0.028
+  context_length: 131072
+  max_output_tokens: 65536
+
+- id: "deepseek/deepseek-v3.2"
+  input_per_mtok: 0.28
+  output_per_mtok: 0.42
+  cache_read_per_mtok: 0.028
+  context_length: 131072
+  max_output_tokens: 8192
+
+# ── Moonshot AI (Kimi): confirmed via direct API scraper; arena.ai data stale ─
+- id: "moonshotai/kimi-k2.6"
+  input_per_mtok: 0.950
+
+- id: "moonshotai/kimi-k2.5"
+  input_per_mtok: 0.600
+  output_per_mtok: 3.000
+
+- id: "moonshotai/kimi-k2-thinking"
+  input_per_mtok: 0.600
+  output_per_mtok: 2.500
+
+# ── MiniMax: confirmed via direct API scraper; arena.ai data stale ────────────
+- id: "minimax/minimax-m2.5"
+  input_per_mtok: 0.307
+
+# ── Zhipu AI (GLM): confirmed via direct API scraper; arena.ai data stale ─────
+- id: "zhipu/glm-5.1"
+  input_per_mtok: 1.400
+  output_per_mtok: 4.400
+
+- id: "zhipu/glm-4.7"
+  input_per_mtok: 0.600
+  output_per_mtok: 2.200
+
+- id: "zhipu/glm-4.7-flashx"
+  input_per_mtok: 0.070
+  output_per_mtok: 0.400
+
+- id: "zhipu/glm-4.6v-flashx"
+  input_per_mtok: 0.040
+  output_per_mtok: 0.400
+
+# ── Qwen (OpenRouter qwen namespace): confirmed via OpenRouter; arena.ai data stale ─
+- id: "qwen/qwen-plus"
+  input_per_mtok: 0.260
+  output_per_mtok: 0.780
+  context_length: 1000000
+
+- id: "qwen/qwen3-coder"
+  input_per_mtok: 0.220
+  output_per_mtok: 1.000
+
+- id: "qwen/qwen-max"
+  input_per_mtok: 1.040
+  output_per_mtok: 4.160
+
+# ── Anthropic: context corrections ───────────────────────────────────────────
+# Source: https://www.anthropic.com/claude/sonnet
+# Sonnet 4.5 has 200K context; OpenRouter incorrectly reports 1M.
+- id: "anthropic/claude-sonnet-4.5"
+  context_length: 200000
+
+# ── OpenAI: GPT-5.4 submodels (arena.ai shows wrong gpt-5.4 prices for these) ──
+- id: "openai/gpt-5.4-nano"
+  input_per_mtok: 0.200
+  output_per_mtok: 1.250
+  cache_read_per_mtok: 0.020
+  context_length: 400000
+  max_output_tokens: 128000
+
+- id: "openai/gpt-5.4-mini"
+  input_per_mtok: 0.750
+  output_per_mtok: 4.500
+  cache_read_per_mtok: 0.075
+  context_length: 400000
+  max_output_tokens: 128000

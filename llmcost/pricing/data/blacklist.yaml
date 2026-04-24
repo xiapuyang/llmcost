@@ -1,0 +1,234 @@
+# Models excluded from output. One entry per model.
+- id: "openai/gpt-4-0314"
+  reason: "deprecated"
+- id: "anthropic/claude-2"
+  reason: "superseded by claude-3"
+
+# Zhipu AI (GLM): specialized/limited variants
+- id: "zhipu/glm-ocr"
+  reason: "OCR-only model, not suitable for agent use"
+
+# Zhipu AI (GLM): older generations superseded by 4.7-flashx at lower price
+- id: "zhipu/glm-4.5-air"
+  reason: "superseded by glm-4.7-flashx (Arena 1443 vs 1373, cheaper)"
+- id: "zhipu/glm-4.5v"
+  reason: "superseded by glm-4.6v-flashx (Arena 1426 vs 1353, cheaper)"
+- id: "zhipu/glm-4.6v"
+  reason: "superseded by glm-4.6v-flashx (same Arena 1426, 87% cheaper)"
+
+# Zhipu AI (GLM): same price as glm-4.7 but lower Arena score
+- id: "zhipu/glm-4.5"
+  reason: "same price as glm-4.7 ($0.60/$2.20) but Arena 1411 vs 1443"
+- id: "zhipu/glm-4.6"
+  reason: "same price as glm-4.7 ($0.60/$2.20) but Arena 1426 vs 1443"
+
+# Zhipu AI (GLM): dominated by cheaper/better alternatives
+- id: "zhipu/glm-5-turbo"
+  reason: "text-only duplicate of glm-5v-turbo, costs more than glm-5 for same Arena 1458"
+- id: "zhipu/glm-4.5-airx"
+  reason: "dominated by glm-5 (Arena 1458 vs 1411, cheaper at $1.00/$3.20)"
+- id: "zhipu/glm-4.5-x"
+  reason: "dominated by glm-5.1 (Arena 1468 vs 1411, half the price)"
+
+# Kimi: old base model superseded by K2.5/K2.6
+- id: "moonshotai/kimi-k2"
+  reason: "old base model, superseded by kimi-k2.5 and kimi-k2.6"
+
+# MiniMax: older M1/M2 versions superseded by M2.5/M2.7
+- id: "minimax/minimax-m1"
+  reason: "M1 era, superseded by M2 series"
+- id: "minimax/minimax-m2"
+  reason: "superseded by M2.5 and M2.7 (Arena 1346 vs 1400/1403)"
+- id: "minimax/minimax-m2.1"
+  reason: "superseded by M2.5 and M2.7 (Arena 1385 vs 1400/1403)"
+
+# MiniMax: specialized/limited variants not suitable for agent use
+- id: "minimax/minimax-m2-her"
+  reason: "64K context, 2K max output — too limited for agent use"
+
+# MiniMax: OpenRouter highspeed routing variants (4x price premium, not real model IDs)
+- id: "minimax/minimax-m2.7-highspeed"
+  reason: "OpenRouter speed routing artifact, 4x price vs base M2.7"
+- id: "minimax/minimax-m2.5-highspeed"
+  reason: "OpenRouter speed routing artifact, 4x price vs base M2.5"
+- id: "minimax/minimax-m2.1-highspeed"
+  reason: "OpenRouter speed routing artifact"
+
+# Anthropic: OpenRouter routing artifacts (not real Anthropic model IDs)
+- id: "anthropic/claude-3.7-sonnet:thinking"
+  reason: "OpenRouter routing suffix, not a direct Anthropic API model ID"
+- id: "anthropic/claude-opus-4.6-fast"
+  reason: "OpenRouter routing artifact, costs more than regular opus-4.6"
+
+# Anthropic: old Opus 4.0/4.1 — superseded by 4.5+ at lower price ($5/$25 vs $15/$75)
+- id: "anthropic/claude-opus-4"
+  reason: "superseded by opus-4.5/4.6/4.7 at lower price"
+- id: "anthropic/claude-opus-4.1"
+  reason: "superseded by opus-4.5/4.6/4.7 at lower price"
+
+# Anthropic: Claude Sonnet 4 (deprecated) — superseded by Sonnet 4.5/4.6
+- id: "anthropic/claude-sonnet-4"
+  reason: "deprecated, superseded by claude-sonnet-4.5 and claude-sonnet-4.6"
+
+# Anthropic: Claude 3 / 3.5 / 3.7 era — superseded by Claude 4 family
+- id: "anthropic/claude-3-haiku"
+  reason: "Claude 3 era, superseded by claude-haiku-4.5"
+- id: "anthropic/claude-3.5-haiku"
+  reason: "superseded by claude-haiku-4.5"
+- id: "anthropic/claude-3.7-sonnet"
+  reason: "superseded by claude-sonnet-4 series at same price with higher arena score"
+
+# Gemini: deprecated models
+- id: "google/gemini-2.0-flash-lite-001"
+  reason: "deprecated — shutting down June 1 2026; migrate to gemini-2.5-flash-lite"
+- id: "google/gemini-2.0-flash-001"
+  reason: "deprecated — shutting down June 1 2026; migrate to gemini-3-flash-preview"
+
+# Gemini: lite variants — reduced capability, weak function calling for agent use
+- id: "google/gemini-2.5-flash-lite"
+  reason: "lite variant, insufficient for agent tool calling"
+
+# OpenAI: open-source/open-weights models hosted on OpenRouter infrastructure
+- id: "openai/gpt-oss-20b"
+  reason: "open-source model, filtered with --show-opensource"
+- id: "openai/gpt-oss-120b"
+  reason: "open-source model, filtered with --show-opensource"
+- id: "openai/gpt-oss-safeguard-20b"
+  reason: "open-source safety model, filtered with --show-opensource"
+
+# OpenAI: GPT-4o-mini — short context and no price advantage
+- id: "openai/gpt-4o-mini"
+  reason: "125K context too short, more expensive than better alternatives"
+
+# OpenAI: deprecated old generations
+- id: "openai/gpt-3.5-turbo"
+  reason: "GPT-3.5 era, superseded"
+- id: "openai/gpt-3.5-turbo-instruct"
+  reason: "GPT-3.5 era, context 3K only"
+- id: "openai/gpt-3.5-turbo-16k"
+  reason: "GPT-3.5 era, superseded"
+- id: "openai/gpt-4"
+  reason: "original GPT-4, $30/$60, 7K context, superseded"
+- id: "openai/gpt-4-turbo"
+  reason: "superseded by gpt-4o and gpt-4.1"
+- id: "openai/gpt-4-1106-preview"
+  reason: "old preview, superseded"
+- id: "openai/o1"
+  reason: "superseded by o3/o4 series"
+
+# OpenAI: OpenRouter routing artifacts (not real OpenAI model IDs)
+- id: "openai/o3-mini-high"
+  reason: "reasoning_effort=high is an API param, not a separate model"
+- id: "openai/o4-mini-high"
+  reason: "reasoning_effort=high is an API param, not a separate model"
+- id: "openai/gpt-4o-mini-search-preview"
+  reason: "search routing variant, not a general-purpose model"
+- id: "openai/gpt-4o-search-preview"
+  reason: "search routing variant, not a general-purpose model"
+- id: "openai/o4-mini-deep-research"
+  reason: "deep-research routing variant, not a general-purpose model"
+- id: "openai/o3-deep-research"
+  reason: "deep-research routing variant, not a general-purpose model"
+
+# OpenAI: GPT-5 chat/codex routing suffixes (OpenRouter-specific, not real model IDs)
+- id: "openai/gpt-5-chat"
+  reason: "OpenRouter routing suffix, use gpt-5 directly"
+- id: "openai/gpt-5-codex"
+  reason: "OpenRouter routing suffix, use gpt-5 directly"
+- id: "openai/gpt-5.1-chat"
+  reason: "OpenRouter routing suffix"
+- id: "openai/gpt-5.1-codex"
+  reason: "OpenRouter routing suffix"
+- id: "openai/gpt-5.1-codex-mini"
+  reason: "OpenRouter routing suffix"
+- id: "openai/gpt-5.1-codex-max"
+  reason: "OpenRouter routing suffix"
+- id: "openai/gpt-5.2-chat"
+  reason: "OpenRouter routing suffix"
+- id: "openai/gpt-5.2-codex"
+  reason: "OpenRouter routing suffix"
+- id: "openai/gpt-5.3-chat"
+  reason: "OpenRouter routing suffix"
+- id: "openai/gpt-5.3-codex"
+  reason: "OpenRouter routing suffix"
+
+# OpenAI: GPT-5 nano — limited context + no prompt caching, unsuitable for long-running agents
+- id: "openai/gpt-5-nano"
+  reason: "390K context only, no prompt caching — 7x24 agent costs are unpredictable"
+
+# OpenAI: GPT-5 older subversions superseded by 5.4
+- id: "openai/gpt-5.1"
+  reason: "superseded by gpt-5.4 at same capability tier"
+- id: "openai/gpt-5.2"
+  reason: "superseded by gpt-5.4"
+- id: "openai/gpt-5.3"
+  reason: "superseded by gpt-5.4"
+- id: "openai/gpt-5.2-pro"
+  reason: "superseded by gpt-5.4-pro"
+
+# xAI: beta versions superseded by stable
+- id: "x-ai/grok-3-mini-beta"
+  reason: "beta, superseded by grok-3-mini (Arena 1357 vs 1362)"
+- id: "x-ai/grok-3-beta"
+  reason: "beta, superseded by grok-3 (which is itself dominated by grok-4.20)"
+
+# xAI: older fast model superseded by grok-4.1-fast
+- id: "x-ai/grok-4-fast"
+  reason: "superseded by grok-4.1-fast (same price, Arena 1421 vs 1461)"
+
+# xAI: dominated by grok-4.20 (cheaper and better)
+- id: "x-ai/grok-3"
+  reason: "dominated by grok-4.20 (Arena 1412 vs 1482, grok-4.20 is cheaper)"
+- id: "x-ai/grok-4"
+  reason: "dominated by grok-4.20 (same Arena 1482, weighted $12.60 vs $5.20, less context)"
+
+# xAI: OpenRouter routing artifact
+- id: "x-ai/grok-4.20-multi-agent"
+  reason: "OpenRouter routing variant, lower Arena than grok-4.20 (1475 vs 1482)"
+
+# xAI: specialized coding model with limited output
+- id: "x-ai/grok-code-fast-1"
+  reason: "coding-specialized, max output 9K — too limited for agent general use"
+
+# Third-party providers on OpenRouter — not official model vendors
+- id: "nex-agi/deepseek-v3.1-nex-n1"
+  reason: "third-party provider (nex-agi), not an official DeepSeek or first-party API"
+- id: "tngtech/deepseek-r1t2-chimera"
+  reason: "third-party provider (tngtech), hybrid model not from an official vendor"
+
+# DeepSeek: R1 distilled open-weights models — not official DeepSeek API offerings,
+# hosted by third-party providers on OpenRouter infrastructure
+- id: "deepseek/deepseek-r1-distill-qwen-32b"
+  reason: "open-weights distillation, not a DeepSeek API service — use deepseek-reasoner"
+- id: "deepseek/deepseek-r1-distill-llama-70b"
+  reason: "open-weights distillation, not a DeepSeek API service — use deepseek-reasoner"
+
+# DeepSeek: pinned version aliases (use deepseek-chat instead)
+- id: "deepseek/deepseek-v3.2"
+  reason: "same as deepseek-chat, use stable alias"
+
+# DeepSeek: historical v3.1 and niche variants
+- id: "deepseek/deepseek-chat-v3.1"
+  reason: "superseded by v3.2"
+- id: "deepseek/deepseek-v3.1-terminus"
+  reason: "specialized variant, not for general use"
+- id: "deepseek/deepseek-v3.2-exp"
+  reason: "experimental, unstable"
+- id: "deepseek/deepseek-v3.2-speciale"
+  reason: "specialized variant, not for general use"
+
+# Google Gemma: open-weights models designed for local deployment, not API use
+- id: "google/gemma-2-27b-it"
+  reason: "local deployment model, not an API-first product"
+- id: "google/gemma-3-4b-it"
+  reason: "local deployment model, not an API-first product"
+- id: "google/gemma-3-12b-it"
+  reason: "local deployment model, not an API-first product"
+- id: "google/gemma-3-27b-it"
+  reason: "local deployment model, not an API-first product"
+- id: "google/gemma-3n-e4b-it"
+  reason: "local deployment model, not an API-first product"
+- id: "google/gemma-4-26b-a4b-it"
+  reason: "local deployment model, not an API-first product"
+- id: "google/gemma-4-31b-it"
+  reason: "local deployment model, not an API-first product"
