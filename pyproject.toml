@@ -45,3 +45,6 @@ testpaths = ["llmcost/pricing/tests"]
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["llmcost*"]
+
+[tool.setuptools.package-data]
+"llmcost.pricing.data" = ["*.json", "*.yaml"]
