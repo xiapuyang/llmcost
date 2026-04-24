@@ -22,6 +22,7 @@ class UseCaseDef:
     cache_hit_ratio: float
     vision_default: bool = False
     default_context_length: int | None = None
+    ask_sample_input: bool = False
 
 
 _USE_CASE_REGISTRY: list[tuple[str, list[UseCaseDef]]] = [
@@ -30,10 +31,10 @@ _USE_CASE_REGISTRY: list[tuple[str, list[UseCaseDef]]] = [
         UseCaseDef("OpenClaw", "multi-turn agent framework",    0.85, 0.45, vision_default=True, default_context_length=256_000),
     ]),
     ("QA / extraction", [
-        UseCaseDef("rag_qa",               "retrieval-augmented QA",                   0.88, 0.25, default_context_length=256_000),
-        UseCaseDef("long_context_qa",      "fixed doc loaded once, queried repeatedly", 0.90, 0.85, default_context_length=256_000),
-        UseCaseDef("structured_extraction","document → structured JSON fields",          0.95, 0.15, default_context_length=256_000),
-        UseCaseDef("classification",       "text → label",                               0.97, 0.55),
+        UseCaseDef("rag_qa",               "retrieval-augmented QA",                   0.88, 0.25, default_context_length=256_000, ask_sample_input=True),
+        UseCaseDef("long_context_qa",      "fixed doc loaded once, queried repeatedly", 0.90, 0.85, default_context_length=256_000, ask_sample_input=True),
+        UseCaseDef("structured_extraction","document → structured JSON fields",          0.95, 0.15, default_context_length=256_000, ask_sample_input=True),
+        UseCaseDef("classification",       "text → label",                               0.97, 0.55, ask_sample_input=True),
     ]),
     ("Code", [
         UseCaseDef("coding",          "code completion / generation",      0.70, 0.50, default_context_length=256_000),
@@ -42,18 +43,18 @@ _USE_CASE_REGISTRY: list[tuple[str, list[UseCaseDef]]] = [
     ]),
     ("Conversation", [
         UseCaseDef("chat",             "conversational assistant",                  0.75, 0.20, vision_default=True),
-        UseCaseDef("customer_support", "support bot with long fixed system prompt", 0.82, 0.80, vision_default=True),
-        UseCaseDef("roleplay_creative","character / story generation",              0.35, 0.65, default_context_length=128_000),
-        UseCaseDef("email_drafting",   "short instruction → full email",            0.30, 0.20),
+        UseCaseDef("customer_support", "support bot with long fixed system prompt", 0.82, 0.80, vision_default=True, ask_sample_input=True),
+        UseCaseDef("roleplay_creative","character / story generation",              0.35, 0.65, default_context_length=128_000, ask_sample_input=True),
+        UseCaseDef("email_drafting",   "short instruction → full email",            0.30, 0.20, ask_sample_input=True),
     ]),
     ("Transform", [
-        UseCaseDef("summarization",   "long document → concise summary",  0.92, 0.10, default_context_length=256_000),
+        UseCaseDef("summarization",   "long document → concise summary",  0.92, 0.10, default_context_length=256_000, ask_sample_input=True),
         UseCaseDef("translation",     "source text → target language",    0.55, 0.15, default_context_length=128_000),
         UseCaseDef("document writing","short instruction → long document", 0.25, 0.10),
     ]),
     ("Reasoning", [
         UseCaseDef("chain_of_thought_reasoning", "step-by-step reasoning (thinking tokens)", 0.12, 0.30),
-        UseCaseDef("math_science_solving",       "problem → detailed solution",              0.10, 0.25),
+        UseCaseDef("math_science_solving",       "problem → detailed solution",              0.10, 0.25, ask_sample_input=True),
     ]),
     ("Image", [
         UseCaseDef("text-to-image", "text prompt → image",                0.50, 0.10),
@@ -168,7 +169,7 @@ class RecommendWizard:
 
         # Q1.6: Optional sample input/output (blended 1:1 with use-case preset)
         is_image_use_case = use_case in IMAGE_USE_CASES
-        if not is_image_use_case and not prefs.vision_input:
+        if _uc is not None and not is_image_use_case and _uc.ask_sample_input:
             sampled = self._collect_samples()
             if sampled is not None:
                 prefs.input_ratio = (prefs.input_ratio + sampled) / 2

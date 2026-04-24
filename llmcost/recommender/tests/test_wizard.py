@@ -117,14 +117,14 @@ def test_sample_blends_with_preset_ratio():
     from llmcost.pricing.config import PROVIDERS
     all_providers = list(PROVIDERS.keys())
 
-    # chat preset = 0.75; sample: input=300 chars, output=100 chars → 0.75
-    # blended = (0.75 + 0.75) / 2 = 0.75
+    # summarization preset = 0.92; sample: input=300 chars, output=100 chars → 0.75
+    # blended = (0.92 + 0.75) / 2 = 0.835
     input_sample = "a" * 300
     output_sample = "b" * 100
 
     prefs = _run_wizard_with_mocks(
         select_map={
-            "use case": "chat", "images": "No",
+            "use case": "summarization", "images": "No",
             "context length": "No requirement", "source region": "Any (default)", "Arena score": "1300 (default)",
         },
         checkbox_return=all_providers,
@@ -132,7 +132,7 @@ def test_sample_blends_with_preset_ratio():
     )
 
     assert prefs.input_ratio_source == "blended"
-    assert abs(prefs.input_ratio - 0.75) < 0.001
+    assert abs(prefs.input_ratio - 0.835) < 0.001
 
 
 def test_use_case_presets_applied_from_registry():
@@ -267,17 +267,17 @@ def test_multiple_samples_blended_with_preset():
     from llmcost.pricing.config import PROVIDERS
     all_providers = list(PROVIDERS.keys())
 
-    # chat preset = 0.75
+    # summarization preset = 0.92
     # Pair 1: input=200, output=200 → 0.5; Pair 2: input=300, output=100 → 0.75
     # Combined sample: (200+300)/(800) = 0.625
-    # Blended: (0.75 + 0.625) / 2 = 0.6875
+    # Blended: (0.92 + 0.625) / 2 = 0.7725
     samples = ["a" * 200, "b" * 200, "c" * 300, "d" * 100]
     confirm_answers = iter([True, False])
 
     def mock_select(prompt, **kwargs):
         m = MagicMock()
         if "use case" in prompt:
-            m.ask.return_value = "chat"
+            m.ask.return_value = "summarization"
         elif "images" in prompt:
             m.ask.return_value = "No"
         else:
@@ -312,7 +312,7 @@ def test_multiple_samples_blended_with_preset():
         prefs = RecommendWizard().run()
 
     assert prefs.input_ratio_source == "blended"
-    assert abs(prefs.input_ratio - 0.6875) < 0.001
+    assert abs(prefs.input_ratio - 0.7725) < 0.001
 
 
 def test_max_price_selected():
