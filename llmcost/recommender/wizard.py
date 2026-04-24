@@ -71,6 +71,15 @@ _ARENA_OPTIONS: list[tuple[str, int]] = [
     ("1400", 1400),
 ]
 
+# Max weighted price options ($/M tokens); 0.0 means no limit
+_PRICE_OPTIONS: list[tuple[str, float]] = [
+    ("No limit (default)", 0.0),
+    ("$10/M", 10.0),
+    ("$25/M", 25.0),
+    ("$50/M", 50.0),
+    ("$75/M", 75.0),
+]
+
 
 @dataclass
 class UserPreferences:
@@ -85,6 +94,7 @@ class UserPreferences:
     cache_hit_ratio: float = 0.5
     min_arena_score: int = 1300
     providers: list[str] | None = None  # None means all providers
+    max_price: float | None = None  # None means no limit ($/M tokens)
 
 
 class RecommendWizard:
@@ -188,6 +198,17 @@ class RecommendWizard:
             )
         )
         prefs.providers = selected if selected else None
+
+        # Q8: Max price
+        price_label = self._ask(
+            questionary.select(
+                "Q8. Maximum weighted price ($/M tokens):",
+                choices=[label for label, _ in _PRICE_OPTIONS],
+                default="No limit (default)",
+            )
+        )
+        raw = dict(_PRICE_OPTIONS)[price_label]
+        prefs.max_price = None if raw == 0.0 else raw
 
         return prefs
 

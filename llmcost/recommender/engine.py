@@ -128,6 +128,19 @@ class ModelRecommender:
             if r.input_per_mtok is not None and r.output_per_mtok is not None
         ]
 
+        # Max weighted price
+        if prefs.max_price is not None:
+            records = [
+                r for r in records
+                if (
+                    w := compute_weighted(
+                        r,
+                        input_ratio=prefs.input_ratio,
+                        cache_hit_ratio=prefs.cache_hit_ratio,
+                    )
+                ) is not None and w <= prefs.max_price
+            ]
+
         return records
 
     def _score(

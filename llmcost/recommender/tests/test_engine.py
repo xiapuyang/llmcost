@@ -56,6 +56,7 @@ def _prefs(**kwargs) -> UserPreferences:
         cache_hit_ratio=0.0,
         min_arena_score=0,
         providers=None,
+        max_price=None,
     )
     defaults.update(kwargs)
     return UserPreferences(**defaults)
@@ -305,3 +306,30 @@ def test_provider_subset_filter():
     recs, _ = ModelRecommender(records).recommend(_prefs(providers=["anthropic", "deepseek"]))
     for r in recs:
         assert r.record.provider in {"anthropic", "deepseek"}
+
+
+def test_max_price_filter():
+    """Models with weighted price above max_price are excluded."""
+    # input_ratio=1.0, cache_hit_ratio=0.0 → weighted = input_per_mtok
+    records = [
+        _record("p/cheap",     input_per_mtok=5.0,  output_per_mtok=5.0,  arena_score=1300),
+        _record("p/mid",       input_per_mtok=25.0, output_per_mtok=25.0, arena_score=1350),
+        _record("p/expensive", input_per_mtok=80.0, output_per_mtok=80.0, arena_score=1400),
+    ]
+    recs, count = ModelRecommender(records).recommend(
+        _prefs(input_ratio=1.0, cache_hit_ratio=0.0, max_price=75.0)
+    )
+    ids = {r.record.id for r in recs}
+    assert "p/expensive" not in ids
+    assert count == 2  # cheap + mid survive
+
+
+def test_max_price_none_no_filter():
+    """max_price=None imposes no price ceiling."""
+    records = [
+        _record("p/cheap",     input_per_mtok=5.0,   output_per_mtok=5.0,   arena_score=1300),
+        _record("p/expensive", input_per_mtok=200.0, output_per_mtok=200.0, arena_score=1400),
+        _record("p/mid",       input_per_mtok=50.0,  output_per_mtok=50.0,  arena_score=1350),
+    ]
+    recs, count = ModelRecommender(records).recommend(_prefs(max_price=None))
+    assert count == 3

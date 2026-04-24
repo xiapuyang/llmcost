@@ -113,6 +113,7 @@ def test_default_values_all_defaults():
     assert prefs.cache_hit_ratio == 0.5
     assert prefs.min_arena_score == 1300
     assert prefs.providers == all_providers
+    assert prefs.max_price is None
 
 
 def test_sample_provided_skips_q2():
@@ -376,3 +377,47 @@ def test_multiple_samples_averaged():
 
     assert prefs.input_ratio_source == "sample"
     assert abs(prefs.input_ratio - 0.625) < 0.001
+
+
+def test_max_price_selected():
+    """Selecting a non-default max price is stored as a float."""
+    from llmcost.pricing.config import PROVIDERS
+    all_providers = list(PROVIDERS.keys())
+
+    prefs = _run_wizard_with_mocks(
+        select_map={
+            "Q1.": "chat",
+            "Q1.5.": "No (default)",
+            "Q2.": "7:3  balanced",
+            "Q3.": "No requirement (default)",
+            "Q4.": "Any (default)",
+            "Q5.": "50% (default)",
+            "Q6.": "1300 (default)",
+            "Q8.": "$75/M",
+        },
+        checkbox_return=all_providers,
+        text_sequence=[""],
+    )
+    assert prefs.max_price == 75.0
+
+
+def test_max_price_default_is_none():
+    """Accepting the Q8 default ('No limit') stores max_price=None."""
+    from llmcost.pricing.config import PROVIDERS
+    all_providers = list(PROVIDERS.keys())
+
+    prefs = _run_wizard_with_mocks(
+        select_map={
+            "Q1.": "chat",
+            "Q1.5.": "No (default)",
+            "Q2.": "7:3  balanced",
+            "Q3.": "No requirement (default)",
+            "Q4.": "Any (default)",
+            "Q5.": "50% (default)",
+            "Q6.": "1300 (default)",
+            "Q8.": "No limit (default)",
+        },
+        checkbox_return=all_providers,
+        text_sequence=[""],
+    )
+    assert prefs.max_price is None
