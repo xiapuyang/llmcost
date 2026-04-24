@@ -17,6 +17,7 @@ env/
 CLAUDE.md
 docs/superpowers/
 docs/plans/
+.context/
 
 # IDE
 .idea/
