@@ -168,6 +168,8 @@ def _collect_groups(
     records: list[ModelRecord],
     input_ratio: float,
     cache_hit_ratio: float,
+    *,
+    group_by_vision: bool = True,
 ) -> list[tuple[tuple, list[ModelRecord]]]:
     """Split records into display groups, each sorted appropriately.
 
@@ -177,6 +179,8 @@ def _collect_groups(
     buckets: dict[tuple, list[ModelRecord]] = {}
     for r in records:
         key = _group_key(r)
+        if not group_by_vision and key != (None, None):
+            key = (key[0], None)
         buckets.setdefault(key, []).append(r)
 
     result = []
@@ -201,6 +205,7 @@ def render_table(
     input_ratio: float,
     cache_hit_ratio: float = 0.0,
     category: str | None = None,
+    group_by_vision: bool = True,
 ) -> None:
     """Render a rich table of model records grouped by (output, vision) and sorted by value ratio.
 
@@ -209,6 +214,7 @@ def render_table(
         input_ratio: Input token cost weight for weighted price calculation.
         cache_hit_ratio: Fraction of input tokens assumed to be cache hits (0.0–1.0).
         category: Category label for the table title (e.g. 'text', 'image').
+        group_by_vision: Whether to split groups by vision input capability.
     """
     output_ratio = 1 - input_ratio
     title = f"[bold]{category.title() if category else 'All'} Models[/bold] — "
@@ -230,13 +236,15 @@ def render_table(
     table.add_column("Arena", justify="right", style="magenta")
     table.add_column("$/kArena", justify="right", style="blue")
 
-    groups = _collect_groups(records, input_ratio, cache_hit_ratio)
+    groups = _collect_groups(records, input_ratio, cache_hit_ratio, group_by_vision=group_by_vision)
     n_groups = len(groups)
 
     for g_idx, (key, group) in enumerate(groups):
         cat, has_vision = key
         if cat is None:
             header = "── no Arena score ──"
+        elif has_vision is None:
+            header = f"── {cat} ──"
         else:
             vision_label = "vision ✓" if has_vision else "vision ✗"
             header = f"── {cat} / {vision_label} ──"

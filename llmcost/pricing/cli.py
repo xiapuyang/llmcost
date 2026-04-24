@@ -36,6 +36,7 @@ def parse_args() -> argparse.Namespace:
         help=f"Fraction of input tokens assumed to be cache hits (default {DEFAULT_CACHE_HIT_RATIO}); 0 to disable",
     )
     p.add_argument("--vision-in", action="store_true", help="Show only models that accept image input")
+    p.add_argument("--no-vision-grouping", action="store_true", help="Do not split groups by vision input capability")
     p.add_argument(
         "--min-arena-score",
         type=int,
@@ -114,7 +115,7 @@ def main() -> None:
         Path(args.export).write_text(md)
         print(f"Exported to {args.export}")
     else:
-        render_table(records, input_ratio=args.input_ratio, cache_hit_ratio=args.cache_hit_ratio, category=args.output)
+        render_table(records, input_ratio=args.input_ratio, cache_hit_ratio=args.cache_hit_ratio, category=args.output, group_by_vision=not args.no_vision_grouping)
         drifted = detect_price_drift(records, threshold=PRICE_DRIFT_THRESHOLD)
         render_drift_warnings(drifted)
 
