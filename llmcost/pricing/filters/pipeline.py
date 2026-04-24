@@ -34,7 +34,8 @@ def _is_redundant_pinned(model_id: str, all_ids: set[str]) -> bool:
 
     if "preview" in slug:
         base = re.sub(r"-preview.*$", "", slug)
-        if _DATE_RE.search(base):
+        # Check date in base AND in the full slug (date may appear after "-preview", e.g. "-preview-09-2025")
+        if _DATE_RE.search(base) or _DATE_RE.search(slug):
             return True
         if f"{prefix}{base}" in all_ids:
             return True
@@ -127,6 +128,21 @@ class RecordFilter:
         """Drop records billed per image (image_per_unit set) — weighted $/M formula does not apply."""
         if enabled:
             self._records = [r for r in self._records if r.image_per_unit is None]
+        return self
+
+    def has_required_parameters(self, params: tuple[str, ...]) -> RecordFilter:
+        """Exclude models that support none of *params*.
+
+        A model passes if it has at least one of the required parameters (OR logic).
+        Models with supported_parameters=None (unreported) are kept — capability unknown.
+        """
+        if params:
+            required = set(params)
+            self._records = [
+                r for r in self._records
+                if r.supported_parameters is None
+                or bool(required.intersection(r.supported_parameters))
+            ]
         return self
 
     def has_cache_pricing(self, enabled: bool = True) -> RecordFilter:

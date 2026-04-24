@@ -16,6 +16,17 @@ _IMAGE_USE_CASES = {"text-to-image", "image editing"}
 # ── Data classes ───────────────────────────────────────────────────────────
 
 @dataclass
+class ScoredCandidate:
+    """A scored model candidate with all ranking dimensions, used for debug output."""
+
+    record: ModelRecord
+    weighted_price: float
+    value_ratio: float | None
+    preferred_score: float   # fraction of preferred params supported (0–1)
+    combined_score: float    # Balanced rank score (lower = better)
+
+
+@dataclass
 class Recommendation:
     """A single model recommendation for one tier."""
 
@@ -72,7 +83,7 @@ class ModelRecommender:
                 winner[0],
                 winner[1],
                 winner[2],
-                f"Lowest $/kArena: {winner[2]:.3f} "
+                f"Lowest $/kArena: {winner[2]:.3f} "  # type: ignore[arg-type]
                 f"(only {surviving_count} model(s) matched your criteria)",
             )
             return [rec], surviving_count
@@ -125,6 +136,7 @@ class ModelRecommender:
             .require_arena_score()
             .exclude_per_image_pricing()
             .has_cache_pricing(enabled=prefs.require_cache_pricing)
+            .has_required_parameters(prefs.required_parameters)
             .max_weighted_price(
                 self._resolve_max_price(prefs),
                 input_ratio=prefs.input_ratio,
@@ -135,15 +147,16 @@ class ModelRecommender:
 
     def _score(
         self, records: list[ModelRecord], prefs: UserPreferences
-    ) -> list[tuple[ModelRecord, float, float | None]]:
-        """Compute weighted price and value ratio for each record.
+    ) -> list[tuple[ModelRecord, float, float | None, float]]:
+        """Compute weighted price, value ratio, and preferred-param score for each record.
 
         Args:
             records: Filtered ModelRecord list.
             prefs: User preferences for scoring.
 
         Returns:
-            List of (record, weighted_price, value_ratio) tuples.
+            List of (record, weighted_price, value_ratio, preferred_score) tuples.
+            preferred_score is the fraction of preferred_parameters the model supports (0–1).
         """
         result = []
         for r in records:
@@ -159,25 +172,34 @@ class ModelRecommender:
                 input_ratio=prefs.input_ratio,
                 cache_hit_ratio=prefs.cache_hit_ratio,
             )
-            result.append((r, w, vr))
+            ps = self._preferred_score(r, prefs.preferred_parameters)
+            result.append((r, w, vr, ps))
         return result
+
+    @staticmethod
+    def _preferred_score(record: ModelRecord, preferred: tuple[str, ...]) -> float:
+        """Return the fraction of preferred parameters supported by record (0–1)."""
+        if not preferred or not record.supported_parameters:
+            return 0.0
+        sp = set(record.supported_parameters)
+        return sum(1 for p in preferred if p in sp) / len(preferred)
 
     def _select_tiers(
         self,
-        scored: list[tuple[ModelRecord, float, float | None]],
+        scored: list[tuple[ModelRecord, float, float | None, float]],
         prefs: UserPreferences,
     ) -> list[Recommendation]:
         """Select Best Value, Best Quality, and Balanced tier winners.
 
         Args:
-            scored: List of (record, weighted_price, value_ratio) tuples.
+            scored: List of (record, weighted_price, value_ratio, preferred_score) tuples.
             prefs: User preferences.
 
         Returns:
             List of up to 3 Recommendation objects (deduplicated by record id).
         """
         # Best Value: lowest $/kArena (value_ratio)
-        with_vr = [(r, w, vr) for r, w, vr in scored if vr is not None]
+        with_vr = [(r, w, vr, ps) for r, w, vr, ps in scored if vr is not None]
         best_value_item = min(with_vr or scored, key=lambda t: t[2] if t[2] is not None else float("inf"))
         best_value = self._make_recommendation(
             "Best Value",
@@ -188,7 +210,7 @@ class ModelRecommender:
         )
 
         # Best Quality: highest Arena score
-        with_arena = [(r, w, vr) for r, w, vr in scored if r.arena_score is not None]
+        with_arena = [(r, w, vr, ps) for r, w, vr, ps in scored if r.arena_score is not None]
         if with_arena:
             best_quality_item = max(with_arena, key=lambda t: t[0].arena_score)
             best_quality = self._make_recommendation(
@@ -201,34 +223,13 @@ class ModelRecommender:
         else:
             best_quality = None
 
-        # Balanced: rank aggregation on $/kArena and arena_score
-        n = len(scored)
-        vr_sorted = sorted(range(n), key=lambda i: scored[i][2] if scored[i][2] is not None else float("inf"))
-        vr_rank = [0] * n
-        for rank, idx in enumerate(vr_sorted):
-            vr_rank[idx] = rank
-
-        def quality_sort_key(i: int) -> int:
-            score = scored[i][0].arena_score
-            return -(score if score is not None else 0)
-
-        quality_sorted = sorted(range(n), key=quality_sort_key)
-        quality_rank = [0] * n
-        for rank, idx in enumerate(quality_sorted):
-            quality_rank[idx] = rank
-
-        # Combined: 40% $/kArena rank + 60% quality rank, normalized to [0, 1]
-        combined = [
-            (0.4 * vr_rank[i] / (n - 1) + 0.6 * quality_rank[i] / (n - 1), i)
-            for i in range(n)
-        ]
-        balanced_idx = min(combined, key=lambda t: t[0])[1]
-        balanced_item = scored[balanced_idx]
+        candidates = self._compute_combined(scored)
+        balanced_item = candidates[0]
         balanced = self._make_recommendation(
             "Balanced",
-            balanced_item[0],
-            balanced_item[1],
-            balanced_item[2],
+            balanced_item.record,
+            balanced_item.weighted_price,
+            balanced_item.value_ratio,
             "Best combined $/kArena + quality rank",
         )
 
@@ -242,6 +243,64 @@ class ModelRecommender:
                 seen_ids.add(rec.record.id)
                 recs.append(rec)
         return recs
+
+    @staticmethod
+    def _compute_combined(
+        scored: list[tuple[ModelRecord, float, float | None, float]],
+    ) -> list[ScoredCandidate]:
+        """Rank all scored records by the Balanced combined score (lower = better).
+
+        Weights: 50% $/kArena rank + 40% quality rank + 10% preferred params (5:4:1).
+
+        Args:
+            scored: List of (record, weighted_price, value_ratio, preferred_score) tuples.
+
+        Returns:
+            List of ScoredCandidate sorted ascending by combined_score.
+        """
+        n = len(scored)
+        vr_sorted = sorted(range(n), key=lambda i: scored[i][2] if scored[i][2] is not None else float("inf"))
+        vr_rank = [0] * n
+        for rank, idx in enumerate(vr_sorted):
+            vr_rank[idx] = rank
+
+        quality_sorted = sorted(range(n), key=lambda i: -(scored[i][0].arena_score or 0))
+        quality_rank = [0] * n
+        for rank, idx in enumerate(quality_sorted):
+            quality_rank[idx] = rank
+
+        denom = max(n - 1, 1)
+        result = []
+        for i, (r, w, vr, ps) in enumerate(scored):
+            combined = (
+                0.50 * vr_rank[i] / denom
+                + 0.40 * quality_rank[i] / denom
+                + 0.10 * (1.0 - ps)
+            )
+            result.append(ScoredCandidate(
+                record=r,
+                weighted_price=w,
+                value_ratio=vr,
+                preferred_score=ps,
+                combined_score=combined,
+            ))
+        result.sort(key=lambda c: c.combined_score)
+        return result
+
+    def debug_candidates(self, prefs: UserPreferences) -> list[ScoredCandidate]:
+        """Return all filtered candidates sorted by Balanced combined score for debug output.
+
+        Args:
+            prefs: User preferences (same as passed to recommend()).
+
+        Returns:
+            List of ScoredCandidate sorted ascending by combined_score.
+        """
+        surviving = self._filter(prefs)
+        if not surviving:
+            return []
+        scored = self._score(surviving, prefs)
+        return self._compute_combined(scored)
 
     @staticmethod
     def _make_recommendation(

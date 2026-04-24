@@ -8,7 +8,9 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-from llmcost.recommender.engine import Recommendation
+from rich import box
+
+from llmcost.recommender.engine import Recommendation, ScoredCandidate
 from llmcost.recommender.wizard import UserPreferences
 
 _CN_PROVIDERS = frozenset({"zhipu", "minimax", "moonshotai", "dashscope", "bytedance-seed"})
@@ -86,6 +88,53 @@ def _build_panel(rec: Recommendation) -> Panel:
         border_style=color,
         expand=True,
     )
+
+
+def render_debug_candidates(
+    candidates: list[ScoredCandidate],
+    prefs: UserPreferences,
+    console: Console,
+) -> None:
+    """Print all filtered candidates ranked by Balanced combined score.
+
+    Args:
+        candidates: Output of ModelRecommender.debug_candidates(), sorted by combined_score.
+        prefs: User preferences (used to show preferred param counts).
+        console: Rich Console instance for output.
+    """
+    n_preferred = len(prefs.preferred_parameters)
+    t = Table(
+        title="[dim]Debug: all candidates ranked by Balanced combined score (lower = better)[/dim]",
+        box=box.SIMPLE_HEAD,
+        show_lines=False,
+    )
+    t.add_column("#", justify="right", style="dim")
+    t.add_column("Model", style="cyan", min_width=22)
+    t.add_column("Provider", style="white")
+    t.add_column("Arena", justify="right", style="magenta")
+    t.add_column("$/kArena↑", justify="right", style="blue")
+    t.add_column("Weighted$/M", justify="right", style="yellow")
+    if n_preferred:
+        t.add_column(f"Preferred ({n_preferred})", justify="center", style="green")
+    t.add_column("Combined", justify="right", style="dim")
+
+    candidates = sorted(candidates, key=lambda c: c.value_ratio if c.value_ratio is not None else float("inf"))
+
+    for rank, c in enumerate(candidates, 1):
+        r = c.record
+        display_id = r.direct_id if r.direct_id else r.id.split("/")[-1]
+        arena = str(r.arena_score) if r.arena_score is not None else "—"
+        vr = f"{c.value_ratio:.3f}" if c.value_ratio is not None else "—"
+        wp = f"${c.weighted_price:.3f}"
+        combined = f"{c.combined_score:.3f}"
+        row = [str(rank), display_id, r.provider_name, arena, vr, wp]
+        if n_preferred:
+            n_hit = round(c.preferred_score * n_preferred)
+            row.append(f"{n_hit}/{n_preferred}")
+        row.append(combined)
+        t.add_row(*row)
+
+    console.print(t)
 
 
 def display_filter_summary(

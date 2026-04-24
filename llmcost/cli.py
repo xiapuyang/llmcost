@@ -16,12 +16,22 @@ def _cmd_price(argv: list[str]) -> None:
 
 def _cmd_recommend(argv: list[str]) -> None:
     """Run the interactive recommendation wizard."""
+    import argparse as _ap
+
     from rich.console import Console
 
     from llmcost.pricing.loader import load_records
-    from llmcost.recommender.display import display_filter_summary, display_recommendations
+    from llmcost.recommender.display import (
+        display_filter_summary,
+        display_recommendations,
+        render_debug_candidates,
+    )
     from llmcost.recommender.engine import ModelRecommender
     from llmcost.recommender.wizard import RecommendWizard
+
+    p = _ap.ArgumentParser(prog="llmcost recommend", add_help=False)
+    p.add_argument("--debug", action="store_true", help="Show all candidates ranked by combined score")
+    args, _ = p.parse_known_args(argv)
 
     console = Console()
     records = load_records(
@@ -39,6 +49,11 @@ def _cmd_recommend(argv: list[str]) -> None:
     display_filter_summary(prefs, total_count, surviving_count, console)
     console.print()
     display_recommendations(recommendations, surviving_count, console)
+
+    if args.debug:
+        console.print()
+        candidates = recommender.debug_candidates(prefs)
+        render_debug_candidates(candidates, prefs, console)
 
 
 def main() -> None:
