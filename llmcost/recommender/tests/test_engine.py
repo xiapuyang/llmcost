@@ -333,3 +333,15 @@ def test_max_price_none_no_filter():
     ]
     recs, count = ModelRecommender(records).recommend(_prefs(max_price=None))
     assert count == 3
+
+
+def test_z_ai_provider_excluded():
+    """z-ai/* records are always filtered out to avoid Zhipu duplicates via OpenRouter."""
+    records = [
+        _record("z-ai/glm-5.1",   provider="z-ai",   input_per_mtok=1.6, output_per_mtok=1.6, arena_score=1501),
+        _record("zhipu/glm-5.1",  provider="zhipu",  input_per_mtok=1.9, output_per_mtok=1.9, arena_score=1501),
+        _record("zhipu/glm-4.7",  provider="zhipu",  input_per_mtok=0.9, output_per_mtok=0.9, arena_score=1442),
+    ]
+    recs, _ = ModelRecommender(records).recommend(_prefs())
+    for r in recs:
+        assert r.record.provider != "z-ai", f"z-ai record should be excluded: {r.record.id}"

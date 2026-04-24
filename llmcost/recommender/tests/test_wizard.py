@@ -113,7 +113,7 @@ def test_default_values_all_defaults():
     assert prefs.cache_hit_ratio == 0.5
     assert prefs.min_arena_score == 1300
     assert prefs.providers == all_providers
-    assert prefs.max_price is None
+    assert prefs.max_price == 10.0
 
 
 def test_sample_provided_skips_q2():
@@ -401,8 +401,8 @@ def test_max_price_selected():
     assert prefs.max_price == 75.0
 
 
-def test_max_price_default_is_none():
-    """Accepting the Q8 default ('No limit') stores max_price=None."""
+def test_max_price_no_limit_is_none():
+    """Selecting 'No limit' stores max_price=None."""
     from llmcost.pricing.config import PROVIDERS
     all_providers = list(PROVIDERS.keys())
 
@@ -415,7 +415,7 @@ def test_max_price_default_is_none():
             "Q4.": "Any (default)",
             "Q5.": "50% (default)",
             "Q6.": "1300 (default)",
-            "Q8.": "No limit (default)",
+            "Q8.": "No limit",
         },
         checkbox_return=all_providers,
         text_sequence=[""],

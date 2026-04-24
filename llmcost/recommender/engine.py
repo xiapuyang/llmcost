@@ -97,6 +97,9 @@ class ModelRecommender:
         records = self._blacklist_filter.apply(self._records, show_all=False)
         records = ArenaFilter(prefs.min_arena_score).apply(records)
 
+        # Drop z-ai: OpenRouter's namespace for Zhipu AI — the direct zhipu/* records are already present
+        records = [r for r in records if r.provider != "z-ai"]
+
         # Use-case → category
         target_category = "image" if prefs.use_case in _IMAGE_USE_CASES else "text"
         records = [r for r in records if r.category == target_category]
