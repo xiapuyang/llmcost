@@ -83,6 +83,11 @@ class ModelRecord:
     per_request_limits: dict | None = None          # {"prompt_tokens": "...", "completion_tokens": "..."}
     description: str | None = None
     created: int | None = None                      # Unix timestamp
+    canonical_slug: str | None = None               # versioned/stable OR ID (e.g. openai/gpt-5.5-pro-20260423)
+    web_search_per_call: float | None = None        # $/call for built-in web search (pricing.web_search)
+    knowledge_cutoff: str | None = None             # ISO date string of training data cutoff
+    expiration_date: str | None = None              # ISO date when this model version is retired
+    tokenizer: str | None = None                    # tokenizer family, e.g. "GPT", "Mistral"
 
     def to_dict(self) -> dict[str, Any]:
         """Convert ModelRecord to dictionary.
