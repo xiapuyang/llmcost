@@ -46,19 +46,38 @@ class CacheManager:
         self.overrides_path = overrides_path
 
     def save(self, records: list[ModelRecord], sources: dict[str, str]) -> None:
-        """Persist records and source metadata to the JSON cache file.
+        """Merge records into the JSON cache file incrementally.
+
+        Existing records not present in the new fetch are preserved.
+        Records present in the new fetch overwrite their cached counterpart by id.
 
         Args:
-            records: List of ModelRecord instances to save.
+            records: Freshly fetched ModelRecord instances.
             sources: Mapping of source name to fetch timestamp string.
         """
+        existing_records, existing_meta = self.load()
+        by_id = {r.id: r for r in existing_records}
+        added = updated = 0
+        for r in records:
+            if r.id in by_id:
+                updated += 1
+            else:
+                added += 1
+            by_id[r.id] = r
+
+        merged_sources = {**existing_meta.get("sources", {}), **sources}
         payload = {
             "fetched_at": datetime.now(timezone.utc).isoformat(),
-            "sources": sources,
-            "models": [r.to_dict() for r in records],
+            "sources": merged_sources,
+            "models": [r.to_dict() for r in by_id.values()],
         }
         self.cache_path.parent.mkdir(parents=True, exist_ok=True)
         self.cache_path.write_text(json.dumps(payload, indent=2))
+        print(
+            f"[cache] saved {len(by_id)} models ({added} new, {updated} updated,"
+            f" {len(existing_records) - updated} preserved)",
+            file=__import__("sys").stderr,
+        )
 
     def load(self) -> tuple[list[ModelRecord], dict[str, Any]]:
         """Load records and metadata from the JSON cache file.
