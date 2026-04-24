@@ -41,7 +41,7 @@ dev = ["pytest>=8", "respx>=0.21"]
 llmcost = "llmcost.cli:main"
 
 [tool.pytest.ini_options]
-testpaths = ["llmcost/pricing/tests"]
+testpaths = ["llmcost/pricing/tests", "llmcost/recommender/tests"]
 
 [tool.setuptools.packages.find]
 where = ["."]
