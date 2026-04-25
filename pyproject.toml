@@ -38,7 +38,7 @@ Issues = "https://github.com/xiapuyang/llmcost/issues"
 dev = ["pytest>=8", "respx>=0.21"]
 
 [project.scripts]
-llmcost = "llmcost.cli:main"
+llm-cost = "llmcost.cli:main"
 
 [tool.pytest.ini_options]
 testpaths = ["llmcost/pricing/tests", "llmcost/recommender/tests"]
