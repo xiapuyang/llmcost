@@ -28,7 +28,7 @@ A CLI tool that fetches real-time LLM API pricing from multiple sources and rank
 Requires Python 3.11+.
 
 ```bash
-pip install git+https://github.com/xiapuyang/llmcost.git
+pip install llm-bench-cost
 ```
 
 For Chinese provider scrapers that require JavaScript rendering, install the Playwright browser:
