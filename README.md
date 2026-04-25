@@ -17,11 +17,8 @@ A CLI tool that fetches real-time LLM API pricing from multiple sources and rank
 
 ## Features
 
-- Aggregates prices from OpenRouter (all major providers) and direct scrapers for Chinese providers (Zhipu, MiniMax, Kimi, DashScope/Qwen)
-- Joins LMSYS Chatbot Arena ELO scores and sorts by **$/kArena** (weighted price per 1000 ELO points — lower is better)
-- Computes **weighted price** accounting for your actual input/output ratio and prompt cache hit rate
-- Detects price drift between OpenRouter and Arena's listed prices
-- Manual `overrides.yaml` for corrections or providers not on OpenRouter
+- **Ranks models by cost-effectiveness** — combines real-time prices from OpenRouter with LMSYS Chatbot Arena ELO scores to produce a single **$/kArena** metric (weighted price ÷ Arena score × 1000); lower is better
+- **Recommends the best model for your use case** — returns three picks tailored to the usage scenario: **Best Value** (lowest $/kArena), **Best Quality** (highest Arena score), and **Balanced** (geometric midpoint)
 
 ## Installation
 
@@ -52,9 +49,6 @@ llm-cost recommend  # interactive wizard or non-interactive --use-case
 # Default view: text models, Arena score >= 1300, weighted price <= $10/M, 50% cache hit assumed
 llm-cost price
 
-# Force re-fetch all sources (OpenRouter, scrapers, Arena scores)
-llm-cost price --refresh
-
 # Adjust for your workload
 llm-cost price --cache-hit-ratio 0         # stateless calls, no prompt cache
 llm-cost price --input-ratio 0.3           # output-heavy (e.g. document generation)
@@ -79,6 +73,9 @@ llm-cost price --show-opensource           # include open-weights models without
 
 # Export
 llm-cost price --export report.md
+
+# Force re-fetch all sources (OpenRouter, scrapers, Arena scores)
+llm-cost price --refresh
 ```
 
 ### `llm-cost recommend` — model recommendation
