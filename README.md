@@ -42,89 +42,89 @@ playwright install chromium
 The CLI has two subcommands:
 
 ```
-llmcost price      # full comparison table with filters
-llmcost recommend  # interactive wizard or non-interactive --use-case
+llm-cost price      # full comparison table with filters
+llm-cost recommend  # interactive wizard or non-interactive --use-case
 ```
 
-### `llmcost price` — comparison table
+### `llm-cost price` — comparison table
 
 ```bash
 # Default view: text models, Arena score >= 1300, weighted price <= $10/M, 50% cache hit assumed
-llmcost price
+llm-cost price
 
 # Force re-fetch all sources (OpenRouter, scrapers, Arena scores)
-llmcost price --refresh
+llm-cost price --refresh
 
 # Adjust for your workload
-llmcost price --cache-hit-ratio 0         # stateless calls, no prompt cache
-llmcost price --input-ratio 0.3           # output-heavy (e.g. document generation)
+llm-cost price --cache-hit-ratio 0         # stateless calls, no prompt cache
+llm-cost price --input-ratio 0.3           # output-heavy (e.g. document generation)
 
 # Filter by provider (aliases supported)
-llmcost price --provider claude
-llmcost price --provider claude,openai,deepseek
+llm-cost price --provider claude
+llm-cost price --provider claude,openai,deepseek
 
 # Filter by capability
-llmcost price --vision-in                 # models that accept image input
-llmcost price --output image              # image generation models only
+llm-cost price --vision-in                 # models that accept image input
+llm-cost price --output image              # image generation models only
 
 # Adjust quality/price thresholds
-llmcost price --min-arena-score 1350
-llmcost price --max-price 5.0
-llmcost price --min-arena-score 0 --max-price 0   # no filters
+llm-cost price --min-arena-score 1350
+llm-cost price --max-price 5.0
+llm-cost price --min-arena-score 0 --max-price 0   # no filters
 
 # Include normally-hidden models
-llmcost price --show-all                  # include blacklisted models (marked ⚠)
-llmcost price --show-pinned               # include date-pinned and superseded previews
-llmcost price --show-opensource           # include open-weights models without Arena score
+llm-cost price --show-all                  # include blacklisted models (marked ⚠)
+llm-cost price --show-pinned               # include date-pinned and superseded previews
+llm-cost price --show-opensource           # include open-weights models without Arena score
 
 # Export
-llmcost price --export report.md
+llm-cost price --export report.md
 ```
 
-### `llmcost recommend` — model recommendation
+### `llm-cost recommend` — model recommendation
 
 Interactive wizard (answers a few questions then prints Best Value / Balanced / Best Quality picks):
 
 ```bash
-llmcost recommend
+llm-cost recommend
 ```
 
 Non-interactive with `--use-case` for scripting or CI:
 
 ```bash
 # Common use cases
-llmcost recommend --use-case chat
-llmcost recommend --use-case coding
-llmcost recommend --use-case code_review
-llmcost recommend --use-case rag_qa
-llmcost recommend --use-case long_context_qa
-llmcost recommend --use-case summarization
-llmcost recommend --use-case translation
-llmcost recommend --use-case structured_extraction
-llmcost recommend --use-case classification
-llmcost recommend --use-case chain_of_thought_reasoning
-llmcost recommend --use-case math_science_solving
-llmcost recommend --use-case text-to-image
-llmcost recommend --use-case "image editing"
+llm-cost recommend --use-case chat
+llm-cost recommend --use-case coding
+llm-cost recommend --use-case code_review
+llm-cost recommend --use-case rag_qa
+llm-cost recommend --use-case long_context_qa
+llm-cost recommend --use-case summarization
+llm-cost recommend --use-case translation
+llm-cost recommend --use-case structured_extraction
+llm-cost recommend --use-case classification
+llm-cost recommend --use-case chain_of_thought_reasoning
+llm-cost recommend --use-case math_science_solving
+llm-cost recommend --use-case text-to-image
+llm-cost recommend --use-case "image editing"
 ```
 
 Combine with filters to narrow results:
 
 ```bash
 # Budget coding model, US providers only, max $2/M
-llmcost recommend --use-case coding --model-source us --max-price 2.0
+llm-cost recommend --use-case coding --model-source us --max-price 2.0
 
 # Vision-capable chat model with at least 64 K context
-llmcost recommend --use-case chat --vision-in --min-context-length 65536
+llm-cost recommend --use-case chat --vision-in --min-context-length 65536
 
 # Chinese providers only, no price cap
-llmcost recommend --use-case summarization --model-source cn
+llm-cost recommend --use-case summarization --model-source cn
 
 # Require the provider to publish cache read pricing
-llmcost recommend --use-case rag_qa --require-cache-pricing
+llm-cost recommend --use-case rag_qa --require-cache-pricing
 ```
 
-Each recommendation prints three picks — **Best Value** (lowest $/kArena), **Best Quality** (highest Arena score), and **Balanced** (geometric midpoint) — along with the equivalent `llmcost price` command so you can inspect the full shortlist.
+Each recommendation prints three picks — **Best Value** (lowest $/kArena), **Best Quality** (highest Arena score), and **Balanced** (geometric midpoint) — along with the equivalent `llm-cost price` command so you can inspect the full shortlist.
 
 ### Provider aliases
 
@@ -169,13 +169,13 @@ Tune `--input-ratio` and `--cache-hit-ratio` to match your actual workload — t
 
 ```bash
 # Western frontier models only
-llmcost price --provider claude,openai,google,deepseek,x-ai
+llm-cost price --provider claude,openai,google,deepseek,x-ai
 
 # Chinese providers (often better value at similar quality)
-llmcost price --provider zhipu,minimax,kimi,dashscope
+llm-cost price --provider zhipu,minimax,kimi,dashscope
 
 # Free / open-weights survey (no Arena filter)
-llmcost price --show-opensource --min-arena-score 0
+llm-cost price --show-opensource --min-arena-score 0
 ```
 
 ### Interpreting the $/kArena column
